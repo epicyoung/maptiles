@@ -11,7 +11,7 @@ export const RAILWAY_GEOJSON_URL =
   process.env.NEXT_PUBLIC_RAILWAY_GEOJSON_URL
   || (process.env.NEXT_PUBLIC_DATA_BASE_URL
     ? `${process.env.NEXT_PUBLIC_DATA_BASE_URL.replace(/\/$/, '')}/railway.geojson`
-    : '/data/railway.geojson');
+    : (process.env.NODE_ENV === 'production' ? `${DEFAULT_CDN_BASE}/railway.geojson` : '/data/railway.geojson'));
 
 /**
  * Terima FeatureCollection berisi LineString (jalur rel) dan Point (stasiun).

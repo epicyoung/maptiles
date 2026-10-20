@@ -17,7 +17,7 @@ export const TOLL_GEOJSON_URL =
   process.env.NEXT_PUBLIC_TOLL_GEOJSON_URL
   || (process.env.NEXT_PUBLIC_DATA_BASE_URL
     ? `${process.env.NEXT_PUBLIC_DATA_BASE_URL.replace(/\/$/, '')}/tol.geojson`
-    : '/data/tol.geojson');
+    : (process.env.NODE_ENV === 'production' ? `${DEFAULT_CDN_BASE}/tol.geojson` : '/data/tol.geojson'));
 
 /**
  * Parse GeoJSON tol jadi daftar garis siap gambar.
