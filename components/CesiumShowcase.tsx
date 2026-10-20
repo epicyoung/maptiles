@@ -614,6 +614,13 @@ export default function CesiumShowcase() {
       viewer.scene.fog.minimumBrightness = 0.2;
       viewerRef.current = viewer;
       const controller = viewer.scene.screenSpaceCameraController;
+      controller.zoomEventTypes = [Cesium.CameraEventType.MIDDLE_DRAG, Cesium.CameraEventType.WHEEL, Cesium.CameraEventType.PINCH];
+      controller.tiltEventTypes = [
+        Cesium.CameraEventType.RIGHT_DRAG,
+        Cesium.CameraEventType.PINCH,
+        { eventType: Cesium.CameraEventType.LEFT_DRAG, modifier: Cesium.KeyboardEventModifier.CTRL },
+        { eventType: Cesium.CameraEventType.RIGHT_DRAG, modifier: Cesium.KeyboardEventModifier.CTRL },
+      ];
       controller.minimumZoomDistance = 25;
       controller.maximumZoomDistance = 25000000;
       controller.zoomFactor = 2.2;
