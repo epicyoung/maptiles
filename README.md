@@ -1,36 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cesium Globe Showcase
 
-## Getting Started
+The application runs at /cesium. The root URL redirects there.
 
-First, run the development server:
+Run npm install, then npm run dev. Use npm run build and npm run start for production.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Local map data
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Toll roads: public/data/tol.geojson (included).
+- Railways and stations: public/data/railway.geojson (included; copied from rail.geojson).
+- BSD boundary: lib/bsdline.ts.
+- District names: lib/mapLayersData.ts.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Railway GeoJSON accepts a FeatureCollection containing LineString or MultiLineString tracks and Point stations. Station Polygons are labeled at their bounds center. A station's name property supplies its label. Coordinates use [longitude, latitude]. A missing railway file displays a message when the layer is enabled.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Overpass is no longer used. CesiumJS, base map tiles, place search, and OSRM route calculation still require internet access.
 
-## Learn More
+## Settings
 
-To learn more about Next.js, take a look at the following resources:
+Defaults: Esri Satellite, BSD boundary and toll roads enabled, railways and district/reference labels disabled. Existing saved preferences and pins are restored from browser storage.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Save Setting exports your starting point, map skin, place names, subtitles, logos, and pinned places as JSON. Import JSON restores those settings. Settings are also saved automatically in the current browser.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The scratch_head.tsx recovery reference is excluded from compilation. CesiumShowcase.tsx.damaged-backup preserves the damaged source before recovery.

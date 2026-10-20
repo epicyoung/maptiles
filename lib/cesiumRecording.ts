@@ -13,7 +13,7 @@ export function startMp4Recording(canvas: HTMLCanvasElement, callbacks: Recordin
     'video/mp4;codecs=avc1',
     'video/mp4',
   ].find(type => MediaRecorder.isTypeSupported(type));
-  if (!mimeType) throw new Error('Browser ini belum mendukung rekaman MP4. Gunakan Chrome atau Edge versi terbaru.');
+  if (!mimeType) throw new Error('This browser does not support MP4 recording. Use a recent version of Chrome or Edge.');
 
   const stream = canvas.captureStream(60);
   const chunks: Blob[] = [];
@@ -39,7 +39,7 @@ export function startMp4Recording(canvas: HTMLCanvasElement, callbacks: Recordin
     failed = true;
     stop();
     release();
-    if (!disposed) callbacks.onError(new Error('Rekaman MP4 gagal. Coba lagi dengan ukuran jendela lebih kecil.'));
+    if (!disposed) callbacks.onError(new Error('MP4 recording failed. Try again with a smaller window.'));
   };
   recorder.onstop = () => {
     release();
