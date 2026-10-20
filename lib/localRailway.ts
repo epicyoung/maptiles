@@ -5,7 +5,13 @@ import { cleanLineCoords, isValidCoord, roundCoord, type LonLat } from './geoLin
 export type RailwayStation = { name: string; lon: number; lat: number };
 export type RailwayData = { lines: LonLat[][]; stations: RailwayStation[] };
 
-export const RAILWAY_GEOJSON_URL = '/data/railway.geojson';
+export const DEFAULT_CDN_BASE = 'https://cdn.jsdelivr.net/gh/epicyoung/maptiles@master/public/data';
+
+export const RAILWAY_GEOJSON_URL =
+  process.env.NEXT_PUBLIC_RAILWAY_GEOJSON_URL
+  || (process.env.NEXT_PUBLIC_DATA_BASE_URL
+    ? `${process.env.NEXT_PUBLIC_DATA_BASE_URL.replace(/\/$/, '')}/railway.geojson`
+    : '/data/railway.geojson');
 
 /**
  * Terima FeatureCollection berisi LineString (jalur rel) dan Point (stasiun).
@@ -63,8 +69,24 @@ export async function loadRailwayGeoJson(
   url: string = RAILWAY_GEOJSON_URL,
   signal?: AbortSignal
 ): Promise<RailwayData | null> {
-  const response = await fetch(url, { signal });
-  if (response.status === 404) return null;
-  if (!response.ok) throw new Error(`Failed to load local railway data (HTTP ${response.status}).`);
-  return parseRailwayGeoJson(await response.json());
+  try {
+    const response = await fetch(url, { signal });
+    if (response.status === 404 && url === '/data/railway.geojson') return null;
+    if (response.ok) {
+      return parseRailwayGeoJson(await response.json());
+    }
+    if (url === '/data/railway.geojson') {
+      throw new Error(`Failed to load local railway data (HTTP ${response.status}).`);
+    }
+  } catch (err) {
+    if (url === '/data/railway.geojson') throw err;
+  }
+
+  // Fallback ke file lokal jika remote URL / CDN gagal
+  const fallback = await fetch('/data/railway.geojson', { signal });
+  if (fallback.status === 404) return null;
+  if (!fallback.ok) {
+    throw new Error(`Failed to load local railway data (HTTP ${fallback.status}).`);
+  }
+  return parseRailwayGeoJson(await fallback.json());
 }

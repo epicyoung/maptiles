@@ -11,7 +11,13 @@ export type TollLine = {
 /** Label nama tol: satu titik per nama, diletakkan di tengah segmen terpanjang. */
 export type TollLabel = { name: string; lon: number; lat: number; lengthKm: number };
 
-export const TOLL_GEOJSON_URL = '/data/tol.geojson';
+export const DEFAULT_CDN_BASE = 'https://cdn.jsdelivr.net/gh/epicyoung/maptiles@master/public/data';
+
+export const TOLL_GEOJSON_URL =
+  process.env.NEXT_PUBLIC_TOLL_GEOJSON_URL
+  || (process.env.NEXT_PUBLIC_DATA_BASE_URL
+    ? `${process.env.NEXT_PUBLIC_DATA_BASE_URL.replace(/\/$/, '')}/tol.geojson`
+    : '/data/tol.geojson');
 
 /**
  * Parse GeoJSON tol jadi daftar garis siap gambar.
@@ -46,9 +52,24 @@ export async function loadTollGeoJson(
   url: string = TOLL_GEOJSON_URL,
   signal?: AbortSignal
 ): Promise<TollLine[]> {
-  const response = await fetch(url, { signal });
-  if (!response.ok) throw new Error(`Failed to load local toll data (HTTP ${response.status}).`);
-  return parseTollGeoJson(await response.json());
+  try {
+    const response = await fetch(url, { signal });
+    if (response.ok) {
+      return parseTollGeoJson(await response.json());
+    }
+    if (url === '/data/tol.geojson') {
+      throw new Error(`Failed to load local toll data (HTTP ${response.status}).`);
+    }
+  } catch (err) {
+    if (url === '/data/tol.geojson') throw err;
+  }
+
+  // Fallback ke aset lokal jika remote URL / CDN gagal
+  const fallback = await fetch('/data/tol.geojson', { signal });
+  if (!fallback.ok) {
+    throw new Error(`Failed to load local toll data (HTTP ${fallback.status}).`);
+  }
+  return parseTollGeoJson(await fallback.json());
 }
 
 /**
