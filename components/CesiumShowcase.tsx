@@ -353,7 +353,21 @@ function getFreeRoamSphere(viewer: any, Cesium: any, defaultHub: {
   }
   return new Cesium.BoundingSphere(pos, 400);
 }
-export default function CesiumShowcase() {
+export interface CesiumShowcaseProps {
+  initialMode?: 'default' | 'bsd';
+}
+
+export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowcaseProps = {}) {
+  const [mode] = useState<'default' | 'bsd'>(() => {
+    if (initialMode === 'bsd') return 'bsd';
+    if (typeof window !== 'undefined') {
+      if (window.location.pathname.startsWith('/bsd')) return 'bsd';
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('mode') === 'bsd' || params.get('bsd') === 'true') return 'bsd';
+    }
+    return 'default';
+  });
+  const isBsdMode = mode === 'bsd';
   const [hub, setHub] = useState<StartPoint>(DEFAULT_START_POINT);
   const hubRef = useRef<StartPoint>(DEFAULT_START_POINT);
   const [pois, setPois] = useState<Poi[]>(DEFAULT_POIS);
@@ -631,7 +645,7 @@ export default function CesiumShowcase() {
       const bsdEntities: any[] = [];
       const flat3D: number[] = [];
       BSD_LINE_COORDINATES.forEach(([lon, lat]) => {
-        flat3D.push(lon, lat, 1);
+        flat3D.push(lon, lat, 6);
       });
       const bsdGlowBorder = viewer.entities.add({
         name: 'BSD City Border Glow',
@@ -657,6 +671,22 @@ export default function CesiumShowcase() {
         }
       });
       bsdEntities.push(bsdCoreBorder);
+      const bsdCenterLabel = viewer.entities.add({
+        name: 'BSD City Territory Label',
+        position: Cesium.Cartesian3.fromDegrees(106.648238, -6.303610, 20),
+        label: {
+          text: '★ BSD CITY',
+          font: '700 13px Geist, sans-serif',
+          fillColor: Cesium.Color.fromCssColorString('#ffaa00'),
+          outlineColor: Cesium.Color.fromCssColorString('#0a0e1a'),
+          outlineWidth: 4,
+          style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+          disableDepthTestDistance: Number.POSITIVE_INFINITY,
+          distanceDisplayCondition: new Cesium.DistanceDisplayCondition(2500, 150000),
+          pixelOffset: new Cesium.Cartesian2(0, -12)
+        }
+      });
+      bsdEntities.push(bsdCenterLabel);
       (viewer as any).__bsdHighlightEntities = bsdEntities; /* Initial static districts + dynamic camera moveEnd listener */
       referenceLabels.show = false;
       const layers = {
@@ -712,30 +742,33 @@ export default function CesiumShowcase() {
         });
       });
       (viewer as any).__onPostRender = onPostRender;
-      const startCinematicOrbit = () => {
+      const startCinematicOrbit = (overrideTarget?: any, overrideRange?: number, overridePitch?: number) => {
         const C = (window as any).Cesium;
         if (!C || !viewer || viewer.isDestroyed()) return;
         viewer.camera.cancelFlight();
 
         // Target whatever exact point on the surface is currently at the screen center
-        const canvas = viewer.canvas;
-        const centerRay = viewer.camera.getPickRay(new C.Cartesian2(canvas.clientWidth / 2, canvas.clientHeight / 2));
-        let targetPos = centerRay ? viewer.scene.globe.pick(centerRay, viewer.scene) : undefined;
+        let targetPos = overrideTarget;
         if (!targetPos) {
-          targetPos = viewer.camera.pickEllipsoid(new C.Cartesian2(canvas.clientWidth / 2, canvas.clientHeight / 2));
-        }
-        if (!targetPos) {
-          const sphere = routeSphereRef.current || freeRoamSphereRef.current || getFreeRoamSphere(viewer, C, hubRef.current);
-          targetPos = sphere.center;
+          const canvas = viewer.canvas;
+          const centerRay = viewer.camera.getPickRay(new C.Cartesian2(canvas.clientWidth / 2, canvas.clientHeight / 2));
+          targetPos = centerRay ? viewer.scene.globe.pick(centerRay, viewer.scene) : undefined;
+          if (!targetPos) {
+            targetPos = viewer.camera.pickEllipsoid(new C.Cartesian2(canvas.clientWidth / 2, canvas.clientHeight / 2));
+          }
+          if (!targetPos) {
+            const sphere = routeSphereRef.current || freeRoamSphereRef.current || getFreeRoamSphere(viewer, C, hubRef.current);
+            targetPos = sphere.center;
+          }
         }
 
         orbitTargetRef.current = targetPos;
-        freeRoamSphereRef.current = new C.BoundingSphere(targetPos, 400);
+        freeRoamSphereRef.current = new C.BoundingSphere(targetPos, overrideRange ?? 400);
 
         // Keep user's exact current distance (zoom), tilt (pitch), and heading without resetting to defaults
-        const currentDist = C.Cartesian3.distance(viewer.camera.positionWC, targetPos);
+        const currentDist = overrideRange ?? C.Cartesian3.distance(viewer.camera.positionWC, targetPos);
         orbitRangeRef.current = currentDist;
-        orbitPitchRef.current = viewer.camera.pitch;
+        orbitPitchRef.current = overridePitch ?? viewer.camera.pitch;
         orbitHeadingRef.current = viewer.camera.heading || 0;
         orbitSpinUpStartRef.current = performance.now();
 
@@ -791,7 +824,45 @@ export default function CesiumShowcase() {
           });
         }, 1200);
       }
-      (viewer as any).__playGlobeIntro = playGlobeIntro; /* Drag detection, Map Pick click detection & Smooth Ease-In-Out Wheel Zoom during autorotate */
+      (viewer as any).__playGlobeIntro = playGlobeIntro;
+
+      const BSD_CENTER_LON = 106.648238;
+      const BSD_CENTER_LAT = -6.303610;
+      const BSD_CAM_LAT = -6.399335;
+      const BSD_CAM_HEIGHT = 8311.0;
+      const BSD_RANGE = 13500.0;
+      const BSD_PITCH_DEG = -38.0;
+
+      function playBsdIntro(C: any) {
+        const generation = ++introGenerationRef.current;
+        viewer.camera.setView({
+          destination: C.Cartesian3.fromDegrees(BSD_CENTER_LON, BSD_CENTER_LAT, 2200000.0),
+          orientation: {
+            heading: 0.0,
+            pitch: C.Math.toRadians(-90.0),
+            roll: 0.0
+          }
+        });
+        setTimeout(() => {
+          if (cancelled || generation !== introGenerationRef.current || activePoiRef.current) return;
+          viewer.camera.flyTo({
+            destination: C.Cartesian3.fromDegrees(BSD_CENTER_LON, BSD_CAM_LAT, BSD_CAM_HEIGHT),
+            orientation: {
+              heading: C.Math.toRadians(0.0),
+              pitch: C.Math.toRadians(BSD_PITCH_DEG),
+              roll: 0.0
+            },
+            duration: 3.2,
+            easingFunction: C.EasingFunction.CUBIC_IN_OUT,
+            complete: () => {
+              if (cancelled || generation !== introGenerationRef.current || activePoiRef.current) return;
+              const bsdTargetPos = C.Cartesian3.fromDegrees(BSD_CENTER_LON, BSD_CENTER_LAT, 0);
+              startCinematicOrbit(bsdTargetPos, BSD_RANGE, C.Math.toRadians(BSD_PITCH_DEG));
+            }
+          });
+        }, 400);
+      }
+      (viewer as any).__playBsdIntro = playBsdIntro; /* Drag detection, Map Pick click detection & Smooth Ease-In-Out Wheel Zoom during autorotate */
       let isPointerDown = false;
       let startX = 0;
       let startY = 0;
@@ -915,7 +986,11 @@ export default function CesiumShowcase() {
           canvas.removeEventListener('wheel', onWheel);
         } catch {/* ignore */}
       };
-      playGlobeIntro(Cesium);
+      if (isBsdMode) {
+        playBsdIntro(Cesium);
+      } else {
+        playGlobeIntro(Cesium);
+      }
       setStatus('ready');
     }).catch((err: Error) => {
       if (!cancelled) {
@@ -1394,19 +1469,25 @@ export default function CesiumShowcase() {
     autoRotateRef.current = false;
     setAutoRotate(false);
     viewer.camera.cancelFlight();
-    viewer.__playGlobeIntro(C);
+    if (isBsdMode && (viewer as any).__playBsdIntro) {
+      (viewer as any).__playBsdIntro(C);
+    } else {
+      viewer.__playGlobeIntro(C);
+    }
   };
   const flyToMacroOverview = () => {
     if (autoRotateRef.current) {
       /* Smoothly zoom out to Macro Overview while continuing auto-rotate! */
-      triggerSmoothOrbitZoom(14500, 2000);
+      triggerSmoothOrbitZoom(isBsdMode ? 18000 : 14500, 2000);
       return;
     }
     const Cesium = (window as any).Cesium;
     const viewer = viewerRef.current;
     if (!Cesium || !viewer) return;
+    const targetLon = isBsdMode ? 106.648238 : hubRef.current.lon;
+    const targetLat = isBsdMode ? -6.303610 : hubRef.current.lat;
     viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(hubRef.current.lon, hubRef.current.lat - 0.045, 14500.0),
+      destination: Cesium.Cartesian3.fromDegrees(targetLon, targetLat - (isBsdMode ? 0.055 : 0.045), isBsdMode ? 18000.0 : 14500.0),
       orientation: {
         heading: Cesium.Math.toRadians(0.0),
         pitch: Cesium.Math.toRadians(-40.0),
@@ -2231,7 +2312,7 @@ export default function CesiumShowcase() {
 </div>
 </section> : <>
 <div className="flex items-center justify-between pb-3 border-b border-slate-900/10 mb-3.5">
-<h1 className="text-xs font-medium uppercase tracking-wider text-slate-800">                    Surrounding Area                  </h1>
+<h1 className="text-xs font-medium uppercase tracking-wider text-slate-800">                    {isBsdMode ? 'BSD City 3D Orbit' : 'Surrounding Area'}                  </h1>
 <button type="button" aria-label="Open layer settings" aria-expanded={settingsOpen} onClick={() => setSettingsOpen(true)} className="rounded-lg px-2 py-1 text-base" title="Layer settings">                    ⚙                  </button>
 </div>                {/* POIN 1: STARTING POINT (HUB 0 KM) — KLIK LANGSUNG BUKA 1 SEARCH OMNIBOX + FREE ROAM */}                <div className="flex items-center justify-between mt-1 mb-1.5">
 <h3 className="text-[10px] uppercase tracking-wider font-medium text-slate-800">                    Starting Point (Point A)                  </h3>
@@ -2369,7 +2450,7 @@ export default function CesiumShowcase() {
       {showRotateSlider && (
         <div className="fixed bottom-6 right-6 z-40 w-72 max-w-[calc(100vw-3rem)] rounded-2xl border border-white/80 bg-white/95 p-3.5 shadow-2xl backdrop-blur-2xl text-slate-800 animate-in fade-in slide-in-from-bottom-2 duration-200">
           <div className="flex items-center justify-between text-[11px] font-medium mb-1.5">
-            <span className="font-semibold text-slate-700">Auto-Rotate Orbit</span>
+            <span className="font-semibold text-slate-700">{isBsdMode ? 'BSD City Orbit' : 'Auto-Rotate Orbit'}</span>
             <div className="flex items-center gap-1.5">
               <span className="text-[#ff5500] font-mono font-bold text-xs">{rotateSpeed.toFixed(1)}x</span>
               <button
@@ -2401,7 +2482,7 @@ export default function CesiumShowcase() {
             <button
               type="button"
               onClick={() => {
-                const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? 2000;
+                const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? (isBsdMode ? 13500 : 2000);
                 triggerSmoothOrbitZoom(cur * 0.65, 950);
               }}
               className="flex-1 rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white py-1 text-[10.5px] font-medium text-slate-700 transition"
@@ -2412,7 +2493,7 @@ export default function CesiumShowcase() {
             <button
               type="button"
               onClick={() => {
-                const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? 2000;
+                const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? (isBsdMode ? 13500 : 2000);
                 triggerSmoothOrbitZoom(cur * 1.55, 1100);
               }}
               className="flex-1 rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white py-1 text-[10.5px] font-medium text-slate-700 transition"
@@ -2422,7 +2503,7 @@ export default function CesiumShowcase() {
             </button>
             <button
               type="button"
-              onClick={() => triggerSmoothOrbitZoom(9500, 1600)}
+              onClick={() => triggerSmoothOrbitZoom(isBsdMode ? 18000 : 9500, 1600)}
               className="rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white px-2 py-1 text-[10.5px] font-medium text-slate-700 transition"
               title="Zoom out to view the surrounding area"
             >
