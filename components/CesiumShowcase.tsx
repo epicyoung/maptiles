@@ -2312,31 +2312,7 @@ export default function CesiumShowcase() {
                   lon: pt.lon
                 })} className="block w-full rounded-lg bg-white/80 hover:bg-orange-500 hover:text-white px-2.5 py-1.5 text-left text-[11px] text-slate-800 transition truncate">                            🏁 {pt.name}                          </button>)}                      </div>}                    {destMessage && <p className="text-[10.5px] text-slate-600 leading-snug">{destMessage}</p>}                  </div>}                {/* Pinned locations */}                <h3 className="mt-2.5 mb-1.5 text-[10px] uppercase tracking-wider font-medium text-slate-800">                  Pinned Location                </h3>
 <div className="space-y-1.5">                  {pois.map(renderPlaceRow)}                </div>
-</>}          </div>          {/* Bottom Toolbar: 5 Tool Icons */}          <div className="relative border-t border-slate-900/10 bg-white/50 p-2 backdrop-blur-md">            {/* POIN 5: Auto-Rotate Speed & Smooth Ease-In-Out Zoom Controls Popover */}            {showRotateSlider && <div className="absolute bottom-[60px] left-2 right-2 z-30 rounded-2xl border border-white/80 bg-white/95 p-3 shadow-xl backdrop-blur-2xl text-slate-800">
-<div className="flex items-center justify-between text-[11px] font-medium mb-1">
-<span>Rotation speed and orbit zoom</span>
-<div className="flex items-center gap-1.5">
-<span className="text-[#ff5500] font-mono">{rotateSpeed.toFixed(1)}x</span>
-<button onClick={() => setShowRotateSlider(false)} className="text-slate-400 hover:text-slate-700 text-xs px-1">                      ✕                    </button>
-</div>
-</div>
-<input type="range" min="0.2" max="3.0" step="0.1" value={rotateSpeed} onChange={e => setRotateSpeed(parseFloat(e.target.value))} className="w-full accent-[#ff5500] h-1.5 bg-slate-200 rounded-lg cursor-pointer" />
-<div className="flex justify-between text-[9px] text-slate-400 mt-1 font-semibold">
-<span>Slow (0.2x)</span>
-<span>Normal (1.0x)</span>
-<span>Fast (3.0x)</span>
-</div>                {/* Tombol Smooth Ease-In-Out Zoom Saat Orbit */}                <div className="mt-2.5 pt-2 border-t border-slate-200/80 flex items-center justify-between gap-1.5">
-<button type="button" onClick={() => {
-                const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? 2000;
-                triggerSmoothOrbitZoom(cur * 0.65, 950);
-              }} className="flex-1 rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white py-1 text-[10.5px] font-medium text-slate-700 transition" title="Smooth zoom in">                    🔍+ Zoom In                  </button>
-<button type="button" onClick={() => {
-                const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? 2000;
-                triggerSmoothOrbitZoom(cur * 1.55, 1100);
-              }} className="flex-1 rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white py-1 text-[10.5px] font-medium text-slate-700 transition" title="Smooth zoom out">                    🔍− Zoom Out                  </button>
-<button type="button" onClick={() => triggerSmoothOrbitZoom(9500, 1600)} className="rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white px-2 py-1 text-[10.5px] font-medium text-slate-700 transition" title="Zoom out to view the surrounding area">                    Wide                  </button>
-</div>
-</div>}            {/* 5 Icons Grid */}            <div className="grid grid-cols-5 gap-1.5">              {/* 1. Mata Coret: Hide/Show Tooltip */}              <button onClick={() => setShowTooltips(!showTooltips)} className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all active:scale-95 ${!showTooltips ? 'bg-rose-50 border-rose-300 text-rose-600 shadow-sm' : 'bg-white/60 border-white/80 text-slate-700 hover:bg-white hover:text-black shadow-sm'}`} title={showTooltips ? 'Hide pins and tooltips' : 'Show pins and tooltips'}>                {!showTooltips ? <svg className="w-4 h-4 text-rose-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+</>}          </div>          {/* Bottom Toolbar: 5 Tool Icons */}          <div className="relative border-t border-slate-900/10 bg-white/50 p-2 backdrop-blur-md">            {/* 5 Icons Grid */}            <div className="grid grid-cols-5 gap-1.5">              {/* 1. Mata Coret: Hide/Show Tooltip */}              <button onClick={() => setShowTooltips(!showTooltips)} className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all active:scale-95 ${!showTooltips ? 'bg-rose-50 border-rose-300 text-rose-600 shadow-sm' : 'bg-white/60 border-white/80 text-slate-700 hover:bg-white hover:text-black shadow-sm'}`} title={showTooltips ? 'Hide pins and tooltips' : 'Show pins and tooltips'}>                {!showTooltips ? <svg className="w-4 h-4 text-rose-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
 <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
 <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
@@ -2389,6 +2365,72 @@ export default function CesiumShowcase() {
 </div>
 </div>
 </aside>
+      {/* Auto-Rotate Floating Control Box di Kanan Bawah */}
+      {showRotateSlider && (
+        <div className="fixed bottom-6 right-6 z-40 w-72 max-w-[calc(100vw-3rem)] rounded-2xl border border-white/80 bg-white/95 p-3.5 shadow-2xl backdrop-blur-2xl text-slate-800 animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="flex items-center justify-between text-[11px] font-medium mb-1.5">
+            <span className="font-semibold text-slate-700">Auto-Rotate Orbit</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[#ff5500] font-mono font-bold text-xs">{rotateSpeed.toFixed(1)}x</span>
+              <button
+                type="button"
+                onClick={() => setShowRotateSlider(false)}
+                className="text-slate-400 hover:text-slate-700 text-xs px-1 rounded hover:bg-slate-100 transition"
+                title="Hide controls"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+          <input
+            type="range"
+            min="0.2"
+            max="3.0"
+            step="0.1"
+            value={rotateSpeed}
+            onChange={e => setRotateSpeed(parseFloat(e.target.value))}
+            className="w-full accent-[#ff5500] h-1.5 bg-slate-200 rounded-lg cursor-pointer"
+          />
+          <div className="flex justify-between text-[9px] text-slate-400 mt-1 font-semibold">
+            <span>Slow (0.2x)</span>
+            <span>Normal (1.0x)</span>
+            <span>Fast (3.0x)</span>
+          </div>
+          {/* Tombol Smooth Ease-In-Out Zoom Saat Orbit */}
+          <div className="mt-2.5 pt-2 border-t border-slate-200/80 flex items-center justify-between gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? 2000;
+                triggerSmoothOrbitZoom(cur * 0.65, 950);
+              }}
+              className="flex-1 rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white py-1 text-[10.5px] font-medium text-slate-700 transition"
+              title="Smooth zoom in"
+            >
+              🔍+ Zoom In
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? 2000;
+                triggerSmoothOrbitZoom(cur * 1.55, 1100);
+              }}
+              className="flex-1 rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white py-1 text-[10.5px] font-medium text-slate-700 transition"
+              title="Smooth zoom out"
+            >
+              🔍− Zoom Out
+            </button>
+            <button
+              type="button"
+              onClick={() => triggerSmoothOrbitZoom(9500, 1600)}
+              className="rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white px-2 py-1 text-[10.5px] font-medium text-slate-700 transition"
+              title="Zoom out to view the surrounding area"
+            >
+              Wide
+            </button>
+          </div>
+        </div>
+      )}
 </div>      {/* Loading overlay */}      {status === 'loading' && <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md">
 <div className="rounded-2xl border border-white/20 bg-slate-950/70 p-6 text-center shadow-[0_16px_50px_rgba(0,0,0,0.6)] backdrop-blur-2xl ring-1 ring-white/10">
 <div className="text-sm font-bold text-white">Loading Cesium 3D Globe...</div>
