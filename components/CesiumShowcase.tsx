@@ -353,6 +353,8 @@ function getFreeRoamSphere(viewer: any, Cesium: any, defaultHub: {
   }
   return new Cesium.BoundingSphere(pos, 400);
 }
+const ROTATE_SPEED_KEY = 'cesium-showcase.rotate-speed.v1';
+const BSD_RANGE_KEY = 'cesium-showcase.bsd-range.v1';
 export interface CesiumShowcaseProps {
   initialMode?: 'default' | 'bsd';
 }
@@ -415,7 +417,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
     distanceKm: number;
     durationMin: number;
   } | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(!isBsdMode);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showBsd, setShowBsd] = useState(true);
   const [showRailways, setShowRailways] = useState(false);
@@ -424,10 +426,10 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
   const [tollCount, setTollCount] = useState(0);
   const [tollLabelCount, setTollLabelCount] = useState(0);
   const [tollError, setTollError] = useState('');
-  const [showTollLabels, setShowTollLabels] = useState(true);
+  const [showTollLabels, setShowTollLabels] = useState(!isBsdMode);
   const tollCollectionRef = useRef<any>(null);
   const tollLabelsRef = useRef<any>(null);
-  const tollVisibilityRef = useRef({ roads: true, labels: true });
+  const tollVisibilityRef = useRef({ roads: true, labels: !isBsdMode });
   const [showDistricts, setShowDistricts] = useState(false);
   const [showEsriLabels, setShowEsriLabels] = useState(false);
   const [mapSkin, setMapSkin] = useState<MapSkin>(DEFAULT_MAP_SKIN);
@@ -460,15 +462,27 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
   } | null>(null);
 
   /* Toolbar action states */
-  const [showTooltips, setShowTooltips] = useState(true);
+  const [showTooltips, setShowTooltips] = useState(!isBsdMode);
   const [autoRotate, setAutoRotate] = useState(false);
-  const [rotateSpeed, setRotateSpeed] = useState(1.0);
+  const userCustomRangeRef = useRef<number | null>(null);
+  const [rotateSpeed, setRotateSpeed] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const s = localStorage.getItem(ROTATE_SPEED_KEY);
+        if (s) {
+          const val = parseFloat(s);
+          if (Number.isFinite(val) && val >= 0.2 && val <= 3.0) return val;
+        }
+      } catch {}
+    }
+    return 1.0;
+  });
   const [showRotateSlider, setShowRotateSlider] = useState(false); /* Video recording states */
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [showRecordModal, setShowRecordModal] = useState(false);
   const [recordWithEarthIntro, setRecordWithEarthIntro] = useState(true); /* Refs for requestAnimationFrame loops */
-  const showTooltipsRef = useRef(true);
+  const showTooltipsRef = useRef(!isBsdMode);
   const autoRotateRef = useRef(false);
   const rotateSpeedRef = useRef(1.0);
   const activePoiRef = useRef<string | null>(null);
@@ -479,12 +493,25 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
   const recordAnimRef = useRef<number | null>(null); /* Helper to trigger smooth Ease-In-Out zoom while Auto-Rotating */
   const triggerSmoothOrbitZoom = (nextTargetRange: number, durationMs = 750) => {
     const clamped = Math.max(80, Math.min(25000000, nextTargetRange));
+    userCustomRangeRef.current = clamped;
+    try {
+      localStorage.setItem(BSD_RANGE_KEY, String(clamped));
+    } catch {}
     const current = orbitRangeRef.current ?? clamped;
     orbitAnimStartRangeRef.current = current;
     orbitAnimTargetRangeRef.current = clamped;
     orbitAnimStartTimeRef.current = performance.now();
     orbitAnimDurationMsRef.current = durationMs;
   };
+  useEffect(() => {
+    try {
+      const r = localStorage.getItem(BSD_RANGE_KEY);
+      if (r) {
+        const val = parseFloat(r);
+        if (Number.isFinite(val) && val >= 500 && val <= 500000) userCustomRangeRef.current = val;
+      }
+    } catch {}
+  }, []);
   useEffect(() => {
     poisRef.current = pois;
   }, [pois]);
@@ -510,7 +537,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
   }, [showTooltips, autoRotate, rotateSpeed, activePoi, darkGlass, showDistricts, showTolls, showTollLabels, showRailways]);
   useEffect(() => {
     const resizePanels = () => {
-      if (window.innerWidth < 1000) {
+      if (isBsdMode || window.innerWidth < 1000) {
         setSidebarOpen(false);
         setSettingsOpen(false);
       }
@@ -521,7 +548,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
       cancelAnimationFrame(id);
       window.removeEventListener('resize', resizePanels);
     };
-  }, []);
+  }, [isBsdMode]);
   useEffect(() => {
     if (!containerRef.current) return;
     const container = containerRef.current;
@@ -671,22 +698,6 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
         }
       });
       bsdEntities.push(bsdCoreBorder);
-      const bsdCenterLabel = viewer.entities.add({
-        name: 'BSD City Territory Label',
-        position: Cesium.Cartesian3.fromDegrees(106.648238, -6.303610, 20),
-        label: {
-          text: '★ BSD CITY',
-          font: '700 13px Geist, sans-serif',
-          fillColor: Cesium.Color.fromCssColorString('#ffaa00'),
-          outlineColor: Cesium.Color.fromCssColorString('#0a0e1a'),
-          outlineWidth: 4,
-          style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-          disableDepthTestDistance: Number.POSITIVE_INFINITY,
-          distanceDisplayCondition: new Cesium.DistanceDisplayCondition(2500, 150000),
-          pixelOffset: new Cesium.Cartesian2(0, -12)
-        }
-      });
-      bsdEntities.push(bsdCenterLabel);
       (viewer as any).__bsdHighlightEntities = bsdEntities; /* Initial static districts + dynamic camera moveEnd listener */
       referenceLabels.show = false;
       const layers = {
@@ -828,36 +839,58 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
 
       const BSD_CENTER_LON = 106.648238;
       const BSD_CENTER_LAT = -6.303610;
-      const BSD_CAM_LAT = -6.399335;
-      const BSD_CAM_HEIGHT = 8311.0;
-      const BSD_RANGE = 13500.0;
-      const BSD_PITCH_DEG = -38.0;
+      const BSD_ORBIT_RANGE = 26000.0;
+      const BSD_ORBIT_PITCH_DEG = -42.0;
 
       function playBsdIntro(C: any) {
         const generation = ++introGenerationRef.current;
+        const bsdCenter = C.Cartesian3.fromDegrees(BSD_CENTER_LON, BSD_CENTER_LAT, 0);
+        const activeRange = userCustomRangeRef.current ?? BSD_ORBIT_RANGE;
+
+        // 1. Luar angkasa: bumi terlihat bulat utuh (altitude 22.000.000 meter)
         viewer.camera.setView({
-          destination: C.Cartesian3.fromDegrees(BSD_CENTER_LON, BSD_CENTER_LAT, 2200000.0),
+          destination: C.Cartesian3.fromDegrees(BSD_CENTER_LON, BSD_CENTER_LAT, 22000000.0),
           orientation: {
             heading: 0.0,
             pitch: C.Math.toRadians(-90.0),
             roll: 0.0
           }
         });
+
+        // 2. Hitung target posisi dan orientasi presisi menghadap pusat BSD sesuai zoom range user
+        const oldPos = viewer.camera.positionWC.clone();
+        const oldDir = viewer.camera.directionWC.clone();
+        const oldUp = viewer.camera.upWC.clone();
+
+        viewer.camera.lookAt(bsdCenter, new C.HeadingPitchRange(0.0, C.Math.toRadians(BSD_ORBIT_PITCH_DEG), activeRange));
+        viewer.camera.lookAtTransform(C.Matrix4.IDENTITY);
+
+        const destPos = viewer.camera.positionWC.clone();
+        const destDir = viewer.camera.directionWC.clone();
+        const destUp = viewer.camera.upWC.clone();
+
+        viewer.camera.setView({
+          destination: oldPos,
+          orientation: {
+            direction: oldDir,
+            up: oldUp
+          }
+        });
+
+        // 3. Dari bola bumi bulat penuh sampai ke BSD City pas 5 detik (duration: 5.0)
         setTimeout(() => {
           if (cancelled || generation !== introGenerationRef.current || activePoiRef.current) return;
           viewer.camera.flyTo({
-            destination: C.Cartesian3.fromDegrees(BSD_CENTER_LON, BSD_CAM_LAT, BSD_CAM_HEIGHT),
+            destination: destPos,
             orientation: {
-              heading: C.Math.toRadians(0.0),
-              pitch: C.Math.toRadians(BSD_PITCH_DEG),
-              roll: 0.0
+              direction: destDir,
+              up: destUp
             },
-            duration: 3.2,
+            duration: 5.0,
             easingFunction: C.EasingFunction.CUBIC_IN_OUT,
             complete: () => {
               if (cancelled || generation !== introGenerationRef.current || activePoiRef.current) return;
-              const bsdTargetPos = C.Cartesian3.fromDegrees(BSD_CENTER_LON, BSD_CENTER_LAT, 0);
-              startCinematicOrbit(bsdTargetPos, BSD_RANGE, C.Math.toRadians(BSD_PITCH_DEG));
+              startCinematicOrbit(bsdCenter, activeRange, C.Math.toRadians(BSD_ORBIT_PITCH_DEG));
             }
           });
         }, 400);
@@ -1478,7 +1511,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
   const flyToMacroOverview = () => {
     if (autoRotateRef.current) {
       /* Smoothly zoom out to Macro Overview while continuing auto-rotate! */
-      triggerSmoothOrbitZoom(isBsdMode ? 18000 : 14500, 2000);
+      triggerSmoothOrbitZoom(isBsdMode ? 35000 : 14500, 2000);
       return;
     }
     const Cesium = (window as any).Cesium;
@@ -1487,7 +1520,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
     const targetLon = isBsdMode ? 106.648238 : hubRef.current.lon;
     const targetLat = isBsdMode ? -6.303610 : hubRef.current.lat;
     viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(targetLon, targetLat - (isBsdMode ? 0.055 : 0.045), isBsdMode ? 18000.0 : 14500.0),
+      destination: Cesium.Cartesian3.fromDegrees(targetLon, targetLat - (isBsdMode ? 0.085 : 0.045), isBsdMode ? 28000.0 : 14500.0),
       orientation: {
         heading: Cesium.Math.toRadians(0.0),
         pitch: Cesium.Math.toRadians(-40.0),
@@ -2469,7 +2502,13 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
             max="3.0"
             step="0.1"
             value={rotateSpeed}
-            onChange={e => setRotateSpeed(parseFloat(e.target.value))}
+            onChange={e => {
+              const val = parseFloat(e.target.value);
+              setRotateSpeed(val);
+              try {
+                localStorage.setItem(ROTATE_SPEED_KEY, String(val));
+              } catch {}
+            }}
             className="w-full accent-[#ff5500] h-1.5 bg-slate-200 rounded-lg cursor-pointer"
           />
           <div className="flex justify-between text-[9px] text-slate-400 mt-1 font-semibold">
@@ -2482,8 +2521,8 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
             <button
               type="button"
               onClick={() => {
-                const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? (isBsdMode ? 13500 : 2000);
-                triggerSmoothOrbitZoom(cur * 0.65, 950);
+                const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? (isBsdMode ? 26000 : 2000);
+                triggerSmoothOrbitZoom(cur * 0.7, 950);
               }}
               className="flex-1 rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white py-1 text-[10.5px] font-medium text-slate-700 transition"
               title="Smooth zoom in"
@@ -2493,8 +2532,8 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
             <button
               type="button"
               onClick={() => {
-                const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? (isBsdMode ? 13500 : 2000);
-                triggerSmoothOrbitZoom(cur * 1.55, 1100);
+                const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? (isBsdMode ? 26000 : 2000);
+                triggerSmoothOrbitZoom(cur * 1.45, 1100);
               }}
               className="flex-1 rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white py-1 text-[10.5px] font-medium text-slate-700 transition"
               title="Smooth zoom out"
@@ -2503,7 +2542,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
             </button>
             <button
               type="button"
-              onClick={() => triggerSmoothOrbitZoom(isBsdMode ? 18000 : 9500, 1600)}
+              onClick={() => triggerSmoothOrbitZoom(isBsdMode ? 35000 : 9500, 1600)}
               className="rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white px-2 py-1 text-[10.5px] font-medium text-slate-700 transition"
               title="Zoom out to view the surrounding area"
             >
