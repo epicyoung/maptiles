@@ -847,7 +847,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
         const bsdCenter = C.Cartesian3.fromDegrees(BSD_CENTER_LON, BSD_CENTER_LAT, 0);
         const activeRange = userCustomRangeRef.current ?? BSD_ORBIT_RANGE;
 
-        // 1. Luar angkasa: bumi terlihat bulat utuh (altitude 22.000.000 meter)
+        // 1. Luar angkasa: bumi terlihat bulat utuh dan tepat di tengah layar (altitude 22.000.000m)
         viewer.camera.setView({
           destination: C.Cartesian3.fromDegrees(BSD_CENTER_LON, BSD_CENTER_LAT, 22000000.0),
           orientation: {
@@ -857,43 +857,57 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
           }
         });
 
-        // 2. Hitung target posisi dan orientasi presisi menghadap pusat BSD sesuai zoom range user
-        const oldPos = viewer.camera.positionWC.clone();
-        const oldDir = viewer.camera.directionWC.clone();
-        const oldUp = viewer.camera.upWC.clone();
-
-        viewer.camera.lookAt(bsdCenter, new C.HeadingPitchRange(0.0, C.Math.toRadians(BSD_ORBIT_PITCH_DEG), activeRange));
-        viewer.camera.lookAtTransform(C.Matrix4.IDENTITY);
-
-        const destPos = viewer.camera.positionWC.clone();
-        const destDir = viewer.camera.directionWC.clone();
-        const destUp = viewer.camera.upWC.clone();
-
-        viewer.camera.setView({
-          destination: oldPos,
-          orientation: {
-            direction: oldDir,
-            up: oldUp
-          }
-        });
-
-        // 3. Dari bola bumi bulat penuh sampai ke BSD City pas 5 detik (duration: 5.0)
+        // 2. Transisi pas 5 detik: Earth selalu di tengah layar (nadir dive) lalu tilt sinematik di akhir
         setTimeout(() => {
           if (cancelled || generation !== introGenerationRef.current || activePoiRef.current) return;
+          // Tahap 1 (3.4 detik): Menukik lurus ke bawah, Earth tetap tepat di tengah layar tanpa mantatin/miring
           viewer.camera.flyTo({
-            destination: destPos,
+            destination: C.Cartesian3.fromDegrees(BSD_CENTER_LON, BSD_CENTER_LAT, 38000.0),
             orientation: {
-              direction: destDir,
-              up: destUp
+              heading: 0.0,
+              pitch: C.Math.toRadians(-90.0),
+              roll: 0.0
             },
-            duration: 5.0,
+            duration: 3.4,
             easingFunction: C.EasingFunction.CUBIC_IN_OUT,
             complete: () => {
               if (cancelled || generation !== introGenerationRef.current || activePoiRef.current) return;
-              startCinematicOrbit(bsdCenter, activeRange, C.Math.toRadians(BSD_ORBIT_PITCH_DEG));
+              // Tahap 2 (1.6 detik): Tilt halus ke sudut 3D -42 derajat menghadap pusat BSD
+              const oldPos = viewer.camera.positionWC.clone();
+              const oldDir = viewer.camera.directionWC.clone();
+              const oldUp = viewer.camera.upWC.clone();
+
+              viewer.camera.lookAt(bsdCenter, new C.HeadingPitchRange(0.0, C.Math.toRadians(BSD_ORBIT_PITCH_DEG), activeRange));
+              viewer.camera.lookAtTransform(C.Matrix4.IDENTITY);
+
+              const destPos = viewer.camera.positionWC.clone();
+              const destDir = viewer.camera.directionWC.clone();
+              const destUp = viewer.camera.upWC.clone();
+
+              viewer.camera.setView({
+                destination: oldPos,
+                orientation: {
+                  direction: oldDir,
+                  up: oldUp
+                }
+              });
+
+              viewer.camera.flyTo({
+                destination: destPos,
+                orientation: {
+                  direction: destDir,
+                  up: destUp
+                },
+                duration: 1.6,
+                easingFunction: C.EasingFunction.QUADRATIC_OUT,
+                complete: () => {
+                  if (cancelled || generation !== introGenerationRef.current || activePoiRef.current) return;
+                  startCinematicOrbit(bsdCenter, activeRange, C.Math.toRadians(BSD_ORBIT_PITCH_DEG));
+                }
+              });
             }
           });
-        }, 400);
+        }, 350);
       }
       (viewer as any).__playBsdIntro = playBsdIntro; /* Drag detection, Map Pick click detection & Smooth Ease-In-Out Wheel Zoom during autorotate */
       let isPointerDown = false;
