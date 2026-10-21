@@ -384,6 +384,8 @@ export default function CesiumShowcase() {
   const routeSphereRef = useRef<any>(null);
   const freeRoamSphereRef = useRef<any>(null); /* Point 5: Smooth Ease-In-Out Auto-Rotate Range & Spin-Up state */
   const orbitRangeRef = useRef<number | null>(null);
+  const orbitPitchRef = useRef<number | null>(null);
+  const orbitTargetRef = useRef<any>(null);
   const orbitAnimStartRangeRef = useRef<number | null>(null);
   const orbitAnimTargetRangeRef = useRef<number | null>(null);
   const orbitAnimStartTimeRef = useRef<number>(0);
@@ -714,13 +716,33 @@ export default function CesiumShowcase() {
         const C = (window as any).Cesium;
         if (!C || !viewer || viewer.isDestroyed()) return;
         viewer.camera.cancelFlight();
-        orbitHeadingRef.current = viewer.camera.heading || 0;
-        const sphere = routeSphereRef.current || freeRoamSphereRef.current || getFreeRoamSphere(viewer, C, hubRef.current);
-        freeRoamSphereRef.current = sphere;
-        const currentDist = C.Cartesian3.distance(viewer.camera.positionWC, sphere.center);
+
+        // Target whatever exact point on the surface is currently at the screen center
+        const canvas = viewer.canvas;
+        const centerRay = viewer.camera.getPickRay(new C.Cartesian2(canvas.clientWidth / 2, canvas.clientHeight / 2));
+        let targetPos = centerRay ? viewer.scene.globe.pick(centerRay, viewer.scene) : undefined;
+        if (!targetPos) {
+          targetPos = viewer.camera.pickEllipsoid(new C.Cartesian2(canvas.clientWidth / 2, canvas.clientHeight / 2));
+        }
+        if (!targetPos) {
+          const sphere = routeSphereRef.current || freeRoamSphereRef.current || getFreeRoamSphere(viewer, C, hubRef.current);
+          targetPos = sphere.center;
+        }
+
+        orbitTargetRef.current = targetPos;
+        freeRoamSphereRef.current = new C.BoundingSphere(targetPos, 400);
+
+        // Keep user's exact current distance (zoom), tilt (pitch), and heading without resetting to defaults
+        const currentDist = C.Cartesian3.distance(viewer.camera.positionWC, targetPos);
         orbitRangeRef.current = currentDist;
-        orbitSpinUpStartRef.current = performance.now(); /* Smooth Ease-In-Out pull-back zoom out when starting orbit */
-        triggerSmoothOrbitZoom(Math.max(currentDist * 1.28, 1650), 1800);
+        orbitPitchRef.current = viewer.camera.pitch;
+        orbitHeadingRef.current = viewer.camera.heading || 0;
+        orbitSpinUpStartRef.current = performance.now();
+
+        // Clear any animated zoom overrides so it starts rotating immediately from current view
+        orbitAnimStartRangeRef.current = null;
+        orbitAnimTargetRangeRef.current = null;
+
         autoRotateRef.current = true;
         setAutoRotate(true);
         setShowRotateSlider(true);
@@ -856,13 +878,15 @@ export default function CesiumShowcase() {
         if (autoRotateRef.current && viewerRef.current) {
           const C = (window as any).Cesium;
           if (C) {
-            const sphere = routeSphereRef.current || freeRoamSphereRef.current || getFreeRoamSphere(viewerRef.current, C, hubRef.current);
+            const target = orbitTargetRef.current
+              || (routeSphereRef.current ? routeSphereRef.current.center : null)
+              || getFreeRoamSphere(viewerRef.current, C, hubRef.current).center;
             if (orbitRangeRef.current === null) {
-              orbitRangeRef.current = C.Cartesian3.distance(viewerRef.current.camera.positionWC, sphere.center);
+              orbitRangeRef.current = C.Cartesian3.distance(viewerRef.current.camera.positionWC, target);
             }
             const baseTarget = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? 1500;
             const factor = e.deltaY > 0 ? 1.24 : 0.8;
-            triggerSmoothOrbitZoom(baseTarget * factor, 650);
+            triggerSmoothOrbitZoom(baseTarget * factor, 400);
           }
         }
       };
@@ -1403,8 +1427,11 @@ export default function CesiumShowcase() {
         const Cesium = (window as any).Cesium;
         if (Cesium && viewer && !viewer.isDestroyed()) {
           viewer.camera.cancelFlight();
-          const sphere = routeSphereRef.current || freeRoamSphereRef.current || getFreeRoamSphere(viewer, Cesium, hubRef.current);
-          freeRoamSphereRef.current = sphere; /* Smooth Ease-In-Out Range interpolation (for pull-back intro & wheel/button zoom) */
+          const target = orbitTargetRef.current
+            || (routeSphereRef.current ? routeSphereRef.current.center : null)
+            || getFreeRoamSphere(viewer, Cesium, hubRef.current).center;
+
+          /* Smooth Ease-In-Out Range interpolation (for wheel zoom during autorotate) */
           if (orbitAnimStartRangeRef.current !== null && orbitAnimTargetRangeRef.current !== null) {
             const elapsed = now - orbitAnimStartTimeRef.current;
             const duration = Math.max(100, orbitAnimDurationMsRef.current);
@@ -1414,18 +1441,27 @@ export default function CesiumShowcase() {
             if (t >= 1) {
               orbitAnimStartRangeRef.current = null;
             }
-          } /* Smooth angular velocity spin-up (ease-in-out over first 1.5s) */
-          const spinElapsed = Math.min(1, (now - orbitSpinUpStartRef.current) / 1500);
+          }
+
+          /* Smooth angular velocity spin-up (ease-in-out over first 1.0s) */
+          const spinElapsed = Math.min(1, (now - orbitSpinUpStartRef.current) / 1000);
           const spinFactor = easeInOutCubic(spinElapsed);
-          orbitHeadingRef.current += 0.16 * rotateSpeedRef.current * spinFactor * dt; /* Dynamic pitch that gently looks more top-down when zoomed far out */
-          const activeRange = orbitRangeRef.current ?? 1800;
-          const zoomRatio = Math.min(1, Math.max(0, (activeRange - 1200) / 15000));
-          const dynamicPitchDeg = -36 - zoomRatio * 12;
+          orbitHeadingRef.current += 0.16 * rotateSpeedRef.current * spinFactor * dt;
+
+          const activeRange = orbitRangeRef.current ?? Cesium.Cartesian3.distance(viewer.camera.positionWC, target);
+          const activePitch = orbitPitchRef.current ?? viewer.camera.pitch;
+
           const camera = viewer.camera;
           const previousPosition = camera.positionWC.clone();
           const previousDirection = camera.directionWC.clone();
           const previousUp = camera.upWC.clone();
-          positionRouteCamera(viewer, Cesium, sphere, orbitHeadingRef.current, orbitRangeRef.current, dynamicPitchDeg);
+
+          camera.lookAt(
+            target,
+            new Cesium.HeadingPitchRange(orbitHeadingRef.current, activePitch, activeRange)
+          );
+          camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+
           const blend = 1 - Math.exp(-7.5 * dt);
           const destination = Cesium.Cartesian3.lerp(previousPosition, camera.positionWC, blend, new Cesium.Cartesian3());
           const direction = Cesium.Cartesian3.normalize(Cesium.Cartesian3.lerp(previousDirection, camera.directionWC, blend, new Cesium.Cartesian3()), new Cesium.Cartesian3());
@@ -2316,10 +2352,12 @@ export default function CesiumShowcase() {
                 autoRotateRef.current = false;
                 setAutoRotate(false);
                 orbitRangeRef.current = null;
+                orbitPitchRef.current = null;
+                orbitTargetRef.current = null;
                 orbitAnimTargetRangeRef.current = null;
                 freeRoamSphereRef.current = null;
               }
-            }} className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all active:scale-95 ${autoRotate ? 'bg-[#ff5500]/15 border-[#ff5500]/50 text-[#ff5500] shadow-sm' : 'bg-white/60 border-white/80 text-slate-700 hover:bg-white hover:text-black shadow-sm'}`} title="Auto-rotate camera (smooth zoom-out and 360-degree orbit)">
+            }} className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all active:scale-95 ${autoRotate ? 'bg-[#ff5500]/15 border-[#ff5500]/50 text-[#ff5500] shadow-sm' : 'bg-white/60 border-white/80 text-slate-700 hover:bg-white hover:text-black shadow-sm'}`} title="Auto-rotate camera (360-degree orbit)">
 <svg className={`w-4 h-4 ${autoRotate ? 'animate-spin' : ''}`} style={autoRotate ? {
                 animationDuration: `${Math.max(1, 4 / rotateSpeed)}s`
               } : {}} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
