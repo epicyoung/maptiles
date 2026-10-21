@@ -1,5 +1,36 @@
 export const RECORDING_SECONDS = 60;
 
+/** Composite the existing pin image into the video canvas; DOM overlays are not captured. */
+export function drawRecordingLogo(
+  ctx: CanvasRenderingContext2D,
+  image: HTMLImageElement | null,
+  pin: { x: number; y: number; ratio?: '3:2' | '4:3'; isHub?: boolean; isActive?: boolean },
+): boolean {
+  if (!image?.complete || !image.naturalWidth || !image.naturalHeight) return false;
+  const width = pin.isHub ? 108 : pin.ratio === '4:3' ? 88 : 96;
+  const height = width * (pin.ratio === '4:3' ? 3 / 4 : 2 / 3);
+  const x = pin.x - width / 2;
+  const y = pin.y - 36 - height;
+  const scale = Math.min((width - 10) / image.naturalWidth, (height - 10) / image.naturalHeight);
+  const imageWidth = image.naturalWidth * scale;
+  const imageHeight = image.naturalHeight * scale;
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(x, y, width, height, 8);
+  ctx.fillStyle = 'rgba(255,255,255,.82)';
+  ctx.fill();
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = pin.isActive ? '#ffa044' : 'rgba(255,255,255,.95)';
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  ctx.beginPath();
+  ctx.roundRect(x + 5, y + 5, width - 10, height - 10, 5);
+  ctx.clip();
+  ctx.drawImage(image, x + (width - imageWidth) / 2, y + (height - imageHeight) / 2, imageWidth, imageHeight);
+  ctx.restore();
+  return true;
+}
+
 type RecordingCallbacks = {
   onComplete: (blob: Blob) => void;
   onError: (error: Error) => void;

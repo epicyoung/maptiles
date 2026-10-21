@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { BSD_LINE_COORDINATES } from "@/lib/bsdline";
 import { DISTRICTS } from "@/lib/mapLayersData";
 import { loadRailwayGeoJson } from "@/lib/localRailway";
-import { startMp4Recording, RECORDING_SECONDS } from "@/lib/cesiumRecording";
+import { drawRecordingLogo, startMp4Recording, RECORDING_SECONDS } from "@/lib/cesiumRecording";
 import { buildTollLabels, loadTollGeoJson } from "@/lib/localToll";
 import { POIS_KEY, buildSetupBundle, readPois, readSetupBundle, type StoredPoi } from "@/lib/placesStore";
 import { DEFAULT_MAP_SKIN, DEFAULT_START_POINT, MAP_SKINS, PREFERENCES_KEY, parseStartPoint, readPreferences, type MapSkin, type StartPoint } from "@/lib/cesiumPreferences";
@@ -1506,6 +1506,11 @@ export default function CesiumShowcase() {
               ctx.lineWidth = 2;
               ctx.strokeStyle = '#0f172a';
               ctx.stroke();
+              const logo = pinRefs.current[loc.id]?.querySelector('img') ?? null;
+              if (drawRecordingLogo(ctx, logo, { x: pos.x, y: pos.y, ratio: placeOverridesRef.current[loc.id]?.ratio, isHub, isActive })) {
+                ctx.restore();
+                return;
+              }
               let name = placeName(loc.id, loc.name, placeOverridesRef.current);
               ctx.font = '500 12px Geist, sans-serif';
               if (ctx.measureText(name).width > 200) {
