@@ -800,7 +800,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
       function playGlobeIntro(C: any) {
         const generation = ++introGenerationRef.current;
         viewer.camera.setView({
-          destination: C.Cartesian3.fromDegrees(hubRef.current.lon, hubRef.current.lat, 6500000.0),
+          destination: C.Cartesian3.fromDegrees(hubRef.current.lon, hubRef.current.lat, 22000000.0),
           orientation: {
             heading: 0.0,
             pitch: C.Math.toRadians(-90.0),
@@ -808,7 +808,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
           }
         });
         setTimeout(() => {
-          if (cancelled || generation !== introGenerationRef.current || autoRotateRef.current || activePoiRef.current) return;
+          if (cancelled || generation !== introGenerationRef.current || activePoiRef.current) return;
           viewer.camera.flyTo({
             destination: C.Cartesian3.fromDegrees(hubRef.current.lon, hubRef.current.lat, 2500.0),
             orientation: {
@@ -1747,7 +1747,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          a.download = `BSD_City_Cinematic_${Date.now()}.mp4`;
+          a.download = isBsdMode ? `BSD_City_3D_Orbit_${Date.now()}.mp4` : `BSD_City_Cinematic_${Date.now()}.mp4`;
           document.body.appendChild(a);
           a.click();
           a.remove();
@@ -1756,46 +1756,15 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
       });
       setIsRecording(true);
       setRecordingSeconds(0);
-      if (recordWithEarthIntro && !autoRotateRef.current) {
-        viewer.camera.setView({
-          destination: Cesium.Cartesian3.fromDegrees(hubRef.current.lon, hubRef.current.lat, 6500000.0),
-          orientation: {
-            heading: 0.0,
-            pitch: Cesium.Math.toRadians(-90.0),
-            roll: 0.0
-          }
-        });
-        recordingIntroRef.current = setTimeout(() => {
-          if (viewer.isDestroyed() || !recordingSessionRef.current || autoRotateRef.current) return;
-          viewer.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(hubRef.current.lon, hubRef.current.lat, 2500.0),
-            orientation: {
-              heading: Cesium.Math.toRadians(0.0),
-              pitch: Cesium.Math.toRadians(-90.0),
-              roll: 0.0
-            },
-            duration: 3.2,
-            easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT,
-            complete: () => {
-              if (viewer.isDestroyed() || !recordingSessionRef.current || autoRotateRef.current) return;
-              if (routeSphereRef.current) {
-                flyToRouteSphere(routeSphereRef.current, 1.6, viewer.__onIntroArrived);
-                return;
-              }
-              viewer.camera.flyTo({
-                destination: Cesium.Cartesian3.fromDegrees(hubRef.current.lon, hubRef.current.lat - 0.012, 1050.0),
-                orientation: {
-                  heading: Cesium.Math.toRadians(0.0),
-                  pitch: Cesium.Math.toRadians(-38.0),
-                  roll: 0.0
-                },
-                duration: 1.6,
-                easingFunction: Cesium.EasingFunction.QUADRATIC_OUT,
-                complete: viewer.__onIntroArrived
-              });
-            }
-          });
-        }, 600);
+      if (recordWithEarthIntro) {
+        autoRotateRef.current = false;
+        setAutoRotate(false);
+        viewer.camera.cancelFlight();
+        if (isBsdMode && (viewer as any).__playBsdIntro) {
+          (viewer as any).__playBsdIntro(Cesium);
+        } else if ((viewer as any).__playGlobeIntro) {
+          (viewer as any).__playGlobeIntro(Cesium);
+        }
       }
     } catch (err) {
       finishRecording();
@@ -2268,7 +2237,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
 <div className="space-y-2.5 mb-5 text-xs font-medium text-slate-700">
 <label className="flex items-center gap-2 cursor-pointer select-none">
 <input type="checkbox" checked={recordWithEarthIntro} onChange={e => setRecordWithEarthIntro(e.target.checked)} className="rounded accent-[#ff5500] w-4 h-4 cursor-pointer" />
-<span>Start from space (skipped while auto-rotate is active)</span>
+<span>Start from space (Full Earth globe intro)</span>
 </label>
 </div>
 <div className="flex gap-2 justify-end">
