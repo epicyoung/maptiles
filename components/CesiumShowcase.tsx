@@ -11,7 +11,7 @@ import { buildTollLabels, loadTollGeoJson } from "@/lib/localToll";
 import { POIS_KEY, buildSetupBundle, readPois, readSetupBundle, type StoredPoi } from "@/lib/placesStore";
 import { DEFAULT_MAP_SKIN, DEFAULT_START_POINT, MAP_SKINS, PREFERENCES_KEY, parseStartPoint, readPreferences, type MapSkin, type StartPoint } from "@/lib/cesiumPreferences";
 import { LOGO_RATIOS, PLACES_KEY, mergeOverride, placeName, readPlaceOverrides, removeOverride, type PlaceOverride, type PlaceOverrides } from "@/lib/placeOverrides";
-const CESIUM_VERSION = "1.115";
+const CESIUM_VERSION = "1.126";
 const CESIUM_JS = `https://cesium.com/downloads/cesiumjs/releases/${CESIUM_VERSION}/Build/Cesium/Cesium.js`;
 const CESIUM_CSS = `https://cesium.com/downloads/cesiumjs/releases/${CESIUM_VERSION}/Build/Cesium/Widgets/widgets.css`;
 type Poi = StoredPoi; /* Default pins stay minimal: users add their own places via search / Point B. */
@@ -305,9 +305,9 @@ function loadCesium(): Promise<any> {
     script.async = true;
     script.dataset.cesiumJs = 'true';
     script.onload = () => {
-      if ((window as any).Cesium) resolve((window as any).Cesium);else reject(new Error('Cesium is unavailable after loading.'));
+      if ((window as any).Cesium) resolve((window as any).Cesium);else reject(new Error('epicyoung 3D engine is unavailable after loading.'));
     };
-    script.onerror = () => reject(new Error('Failed to load CesiumJS from the CDN.'));
+    script.onerror = () => reject(new Error('Failed to load epicyoung 3D engine from CDN.'));
     document.head.appendChild(script);
   });
   return cesiumLoader;
@@ -409,6 +409,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
   const orbitSpinUpStartRef = useRef<number>(0);
   const orbitHeadingRef = useRef(0);
   const introGenerationRef = useRef(0);
+  const isIntroPlayingRef = useRef(false);
   const routeRequestRef = useRef<AbortController | null>(null);
   const [status, setStatus] = useState<Status>('loading');
   const [error, setError] = useState<string | null>(null);
@@ -477,7 +478,49 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
     }
     return 1.0;
   });
-  const [showRotateSlider, setShowRotateSlider] = useState(false); /* Video recording states */
+  const [showRotateSlider, setShowRotateSlider] = useState(false);
+  const [rotatePanelPos, setRotatePanelPos] = useState<{ x: number; y: number } | null>(null);
+  const rotatePanelRef = useRef<HTMLDivElement>(null);
+  const isDraggingPanelRef = useRef(false);
+  const dragStartOffsetRef = useRef({ x: 0, y: 0 });
+
+  const handlePanelDragStart = (e: React.PointerEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('button') || target.closest('input')) return;
+    const panel = rotatePanelRef.current;
+    if (!panel) return;
+    const rect = panel.getBoundingClientRect();
+    isDraggingPanelRef.current = true;
+    dragStartOffsetRef.current = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const handlePanelDragMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingPanelRef.current || !rotatePanelRef.current) return;
+    const panel = rotatePanelRef.current;
+    const panelWidth = panel.offsetWidth;
+    const panelHeight = panel.offsetHeight;
+
+    const newX = e.clientX - dragStartOffsetRef.current.x;
+    const newY = e.clientY - dragStartOffsetRef.current.y;
+
+    const clampedX = Math.max(12, Math.min(window.innerWidth - panelWidth - 12, newX));
+    const clampedY = Math.max(12, Math.min(window.innerHeight - panelHeight - 12, newY));
+
+    setRotatePanelPos({ x: clampedX, y: clampedY });
+  };
+
+  const handlePanelDragEnd = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (isDraggingPanelRef.current) {
+      isDraggingPanelRef.current = false;
+      try {
+        (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+      } catch {/* ignore */}
+    }
+  }; /* Video recording states */
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [showRecordModal, setShowRecordModal] = useState(false);
@@ -668,7 +711,52 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
       controller.maximumZoomDistance = 25000000;
       controller.zoomFactor = 2.2;
       controller.inertiaZoom = 0.75;
-      controller.enableCollisionDetection = false; /* Border Area BSD from bsdline.kmz */
+      controller.enableCollisionDetection = true;
+      if ('maximumTiltAngle' in controller) {
+        controller.maximumTiltAngle = Cesium.Math.toRadians(88.0);
+      }
+      viewer.camera.constrainedAxis = Cesium.Cartesian3.UNIT_Z;
+
+      /* Pitch & Roll Locks: Prevent camera from flipping upside down when tilting all the way down */
+      const MIN_PITCH = Cesium.Math.toRadians(-88.0);
+      const MAX_PITCH = Cesium.Math.toRadians(-2.0);
+
+      const onPreRender = () => {
+        const camera = viewer.camera;
+        if (!camera || viewer.isDestroyed()) return;
+        if (isIntroPlayingRef.current) return;
+
+        let pitch = camera.pitch;
+        let roll = camera.roll;
+        let needsFix = false;
+
+        if (pitch < MIN_PITCH) {
+          pitch = MIN_PITCH;
+          needsFix = true;
+        } else if (pitch > MAX_PITCH) {
+          pitch = MAX_PITCH;
+          needsFix = true;
+        }
+
+        if (Math.abs(roll) > 0.005) {
+          roll = 0.0;
+          needsFix = true;
+        }
+
+        if (needsFix) {
+          camera.setView({
+            destination: camera.positionWC,
+            orientation: {
+              heading: camera.heading,
+              pitch: pitch,
+              roll: 0.0,
+            },
+          });
+        }
+      };
+
+      viewer.scene.preRender.addEventListener(onPreRender);
+      (viewer as any).__onPreRender = onPreRender;
       const bsdEntities: any[] = [];
       const flat3D: number[] = [];
       BSD_LINE_COORDINATES.forEach(([lon, lat]) => {
@@ -798,6 +886,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
       };
       viewer.__onIntroArrived = onIntroArrived;
       function playGlobeIntro(C: any) {
+        isIntroPlayingRef.current = true;
         const generation = ++introGenerationRef.current;
         viewer.camera.setView({
           destination: C.Cartesian3.fromDegrees(hubRef.current.lon, hubRef.current.lat, 22000000.0),
@@ -808,7 +897,10 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
           }
         });
         setTimeout(() => {
-          if (cancelled || generation !== introGenerationRef.current || activePoiRef.current) return;
+          if (cancelled || generation !== introGenerationRef.current || activePoiRef.current) {
+            isIntroPlayingRef.current = false;
+            return;
+          }
           viewer.camera.flyTo({
             destination: C.Cartesian3.fromDegrees(hubRef.current.lon, hubRef.current.lat, 2500.0),
             orientation: {
@@ -819,7 +911,10 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
             duration: 3.0,
             easingFunction: C.EasingFunction.CUBIC_IN_OUT,
             complete: () => {
-              if (cancelled || generation !== introGenerationRef.current || autoRotateRef.current || activePoiRef.current) return;
+              if (cancelled || generation !== introGenerationRef.current || autoRotateRef.current || activePoiRef.current) {
+                isIntroPlayingRef.current = false;
+                return;
+              }
               viewer.camera.flyTo({
                 destination: C.Cartesian3.fromDegrees(hubRef.current.lon, hubRef.current.lat - 0.012, 1050.0),
                 orientation: {
@@ -829,7 +924,10 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
                 },
                 duration: 1.5,
                 easingFunction: C.EasingFunction.QUADRATIC_OUT,
-                complete: onIntroArrived
+                complete: () => {
+                  isIntroPlayingRef.current = false;
+                  onIntroArrived();
+                }
               });
             }
           });
@@ -843,6 +941,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
       const BSD_ORBIT_PITCH_DEG = -42.0;
 
       function playBsdIntro(C: any) {
+        isIntroPlayingRef.current = true;
         const generation = ++introGenerationRef.current;
         const bsdCenter = C.Cartesian3.fromDegrees(BSD_CENTER_LON, BSD_CENTER_LAT, 0);
         const activeRange = userCustomRangeRef.current ?? BSD_ORBIT_RANGE;
@@ -859,7 +958,10 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
 
         // 2. Transisi pas 5 detik: Earth selalu di tengah layar (nadir dive) lalu tilt sinematik di akhir
         setTimeout(() => {
-          if (cancelled || generation !== introGenerationRef.current || activePoiRef.current) return;
+          if (cancelled || generation !== introGenerationRef.current || activePoiRef.current) {
+            isIntroPlayingRef.current = false;
+            return;
+          }
           // Tahap 1 (3.4 detik): Menukik lurus ke bawah, Earth tetap tepat di tengah layar tanpa mantatin/miring
           viewer.camera.flyTo({
             destination: C.Cartesian3.fromDegrees(BSD_CENTER_LON, BSD_CENTER_LAT, 38000.0),
@@ -871,7 +973,10 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
             duration: 3.4,
             easingFunction: C.EasingFunction.CUBIC_IN_OUT,
             complete: () => {
-              if (cancelled || generation !== introGenerationRef.current || activePoiRef.current) return;
+              if (cancelled || generation !== introGenerationRef.current || activePoiRef.current) {
+                isIntroPlayingRef.current = false;
+                return;
+              }
               // Tahap 2 (1.6 detik): Tilt halus ke sudut 3D -42 derajat menghadap pusat BSD
               const oldPos = viewer.camera.positionWC.clone();
               const oldDir = viewer.camera.directionWC.clone();
@@ -901,6 +1006,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
                 duration: 1.6,
                 easingFunction: C.EasingFunction.QUADRATIC_OUT,
                 complete: () => {
+                  isIntroPlayingRef.current = false;
                   if (cancelled || generation !== introGenerationRef.current || activePoiRef.current) return;
                   startCinematicOrbit(bsdCenter, activeRange, C.Math.toRadians(BSD_ORBIT_PITCH_DEG));
                 }
@@ -921,6 +1027,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
         startX = e.clientX;
         startY = e.clientY;
         activePointers++;
+        isIntroPlayingRef.current = false;
       };
       const onPointerMove = (e: PointerEvent) => {
         if (!isPointerDown) return;
@@ -1064,6 +1171,11 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
       if (viewer) {
         try {
           viewer.scene.postRender.removeEventListener((viewer as any).__onPostRender);
+        } catch {/* ignore */}
+        try {
+          if ((viewer as any).__onPreRender) {
+            viewer.scene.preRender.removeEventListener((viewer as any).__onPreRender);
+          }
         } catch {/* ignore */}
         viewer.destroy();
       }
@@ -2381,13 +2493,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
 <span>🎯</span>
 <span>                          {mapPickMode === 'hub' ? 'Click on the map now...' : 'Pick on the map (free roam)'}                        </span>
 </button>
-</div>                    {hubResults.length > 0 && <div className="max-h-36 overflow-y-auto space-y-1 pt-1 cesium-glass-scroll">                        {hubResults.map((pt, idx) => <button key={`${pt.lon}-${pt.lat}-${idx}`} type="button" onClick={() => applyNewHubPoint(pt)} className="block w-full rounded-lg bg-white/75 hover:bg-orange-500 hover:text-white px-2.5 py-1.5 text-left text-[11px] text-slate-800 transition truncate">                            📍 {pt.name}                          </button>)}                      </div>}                    {hubMessage && <p role="status" className="text-[10.5px] text-slate-600 leading-snug">                        {hubMessage}                      </p>}                  </div>}                <label className="mb-2.5 flex cursor-pointer items-start gap-2 text-[11px] text-slate-800">
-<input type="checkbox" checked={autoRotateOnArrival} onChange={event => {
-                const checked = event.target.checked;
-                autoArrivalRef.current = checked;
-                setAutoRotateOnArrival(checked);
-                persistPreferences(hub, checked);
-              }} className="mt-0.5 accent-orange-600" />                  Auto-rotate after the intro finishes                </label>                {/* POIN 2: PENCARIAN & PILIH PETA UNTUK TITIK B (DESTINASI CUSTOM) */}                <div className="flex items-center justify-between mt-3 mb-1.5">
+</div>                    {hubResults.length > 0 && <div className="max-h-36 overflow-y-auto space-y-1 pt-1 cesium-glass-scroll">                        {hubResults.map((pt, idx) => <button key={`${pt.lon}-${pt.lat}-${idx}`} type="button" onClick={() => applyNewHubPoint(pt)} className="block w-full rounded-lg bg-white/75 hover:bg-orange-500 hover:text-white px-2.5 py-1.5 text-left text-[11px] text-slate-800 transition truncate">                            📍 {pt.name}                          </button>)}                      </div>}                    {hubMessage && <p role="status" className="text-[10.5px] text-slate-600 leading-snug">                        {hubMessage}                      </p>}                  </div>}                {/* POIN 2: PENCARIAN & PILIH PETA UNTUK TITIK B (DESTINASI CUSTOM) */}                <div className="flex items-center justify-between mt-3 mb-1.5">
 <h3 className="text-[10px] uppercase tracking-wider font-medium text-slate-800">                    Destination (Point B)                  </h3>
 <button type="button" aria-label={destSearchOpen ? 'Close place search' : 'Add place'} aria-expanded={destSearchOpen} title={destSearchOpen ? 'Close place search' : 'Add place'} onClick={() => {
                 setDestSearchOpen(prev => !prev);
@@ -2417,26 +2523,46 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
 </svg> : <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
 <circle cx="12" cy="12" r="3" />
-</svg>}              </button>              {/* 2. Auto Rotate (with smooth Ease-In-Out Zoom Out pull-back) */}              <button onClick={() => {
-              const next = !autoRotate;
-              if (next && viewerRef.current?.__startCinematicOrbit) {
-                viewerRef.current.__startCinematicOrbit();
-              } else {
-                autoRotateRef.current = false;
-                setAutoRotate(false);
-                orbitRangeRef.current = null;
-                orbitPitchRef.current = null;
-                orbitTargetRef.current = null;
-                orbitAnimTargetRangeRef.current = null;
-                freeRoamSphereRef.current = null;
-              }
-            }} className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all active:scale-95 ${autoRotate ? 'bg-[#ff5500]/15 border-[#ff5500]/50 text-[#ff5500] shadow-sm' : 'bg-white/60 border-white/80 text-slate-700 hover:bg-white hover:text-black shadow-sm'}`} title="Auto-rotate camera (360-degree orbit)">
-<svg className={`w-4 h-4 ${autoRotate ? 'animate-spin' : ''}`} style={autoRotate ? {
-                animationDuration: `${Math.max(1, 4 / rotateSpeed)}s`
-              } : {}} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-<path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
-</svg>
-</button>              {/* 3. Bird Eye (Icon Burung) */}              <button onClick={flyToMacroOverview} className="flex flex-col items-center justify-center p-2 rounded-xl border border-white/80 bg-white/60 text-slate-700 hover:bg-white hover:text-black shadow-sm transition-all active:scale-95" title="Bird’s-eye overview">
+</svg>}              </button>              {/* 2. Auto Rotate (with smooth Ease-In-Out Zoom Out pull-back) */}
+              <button
+                onClick={() => {
+                  if (autoRotate && !showRotateSlider) {
+                    setShowRotateSlider(true);
+                    return;
+                  }
+                  const next = !autoRotate;
+                  if (next) {
+                    if (viewerRef.current?.__startCinematicOrbit) {
+                      viewerRef.current.__startCinematicOrbit();
+                    }
+                    setShowRotateSlider(true);
+                  } else {
+                    autoRotateRef.current = false;
+                    setAutoRotate(false);
+                    setShowRotateSlider(false);
+                    orbitRangeRef.current = null;
+                    orbitPitchRef.current = null;
+                    orbitTargetRef.current = null;
+                    orbitAnimTargetRangeRef.current = null;
+                    freeRoamSphereRef.current = null;
+                  }
+                }}
+                className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all active:scale-95 ${autoRotate ? 'bg-[#ff5500]/15 border-[#ff5500]/50 text-[#ff5500] shadow-sm' : 'bg-white/60 border-white/80 text-slate-700 hover:bg-white hover:text-black shadow-sm'}`}
+                title="Auto-rotate camera (360-degree orbit)"
+              >
+                <svg
+                  className={`w-4 h-4 ${autoRotate ? 'animate-spin' : ''}`}
+                  style={autoRotate ? { animationDuration: `${Math.max(1, 4 / rotateSpeed)}s` } : {}}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                </svg>
+              </button>              {/* 3. Bird Eye (Icon Burung) */}              <button onClick={flyToMacroOverview} className="flex flex-col items-center justify-center p-2 rounded-xl border border-white/80 bg-white/60 text-slate-700 hover:bg-white hover:text-black shadow-sm transition-all active:scale-95" title="Bird’s-eye overview">
 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 <path d="M16 7h.01" />
 <path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 18Z" />
@@ -2462,89 +2588,146 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
 </div>
 </div>
 </aside>
-      {/* Auto-Rotate Floating Control Box di Kanan Bawah */}
+      {/* Top Right epicyoung Brand Logo */}
+      <div className="fixed top-4 right-4 z-40 flex items-center justify-center rounded-2xl border border-white/70 bg-white/85 px-3 py-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl transition hover:bg-white/95 hover:scale-105 select-none pointer-events-auto ring-1 ring-black/5">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/epicyoung-logo.png"
+          alt="epicyoung"
+          className="h-6 sm:h-7 w-auto object-contain pointer-events-none"
+          draggable={false}
+        />
+      </div>
+
+      {/* Auto-Rotate Floating Control Box di Kanan Bawah (Draggable dengan padding) */}
       {showRotateSlider && (
-        <div className="fixed bottom-6 right-6 z-40 w-72 max-w-[calc(100vw-3rem)] rounded-2xl border border-white/80 bg-white/95 p-3.5 shadow-2xl backdrop-blur-2xl text-slate-800 animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <div className="flex items-center justify-between text-[11px] font-medium mb-1.5">
-            <span className="font-semibold text-slate-700">{isBsdMode ? 'BSD City Orbit' : 'Auto-Rotate Orbit'}</span>
+        <div
+          ref={rotatePanelRef}
+          style={
+            rotatePanelPos
+              ? { left: `${rotatePanelPos.x}px`, top: `${rotatePanelPos.y}px`, right: 'auto', bottom: 'auto' }
+              : { right: '24px', bottom: '24px' }
+          }
+          className="fixed z-40 w-80 max-w-[calc(100vw-3rem)] rounded-2xl border border-white/80 bg-white/95 p-3.5 shadow-2xl backdrop-blur-2xl text-slate-800 animate-in fade-in slide-in-from-bottom-2 duration-200 select-none ring-1 ring-black/5"
+        >
+          {/* Drag Handle & Header */}
+          <div
+            onPointerDown={handlePanelDragStart}
+            onPointerMove={handlePanelDragMove}
+            onPointerUp={handlePanelDragEnd}
+            onPointerCancel={handlePanelDragEnd}
+            className="flex items-center justify-between pb-2 mb-2 border-b border-slate-200/80 cursor-grab active:cursor-grabbing touch-none select-none"
+            title="Drag to reposition panel"
+          >
             <div className="flex items-center gap-1.5">
-              <span className="text-[#ff5500] font-mono font-bold text-xs">{rotateSpeed.toFixed(1)}x</span>
+              <span className="text-slate-400 font-mono text-sm leading-none" aria-hidden="true">⠿</span>
+              <span className="font-semibold text-xs text-slate-800">
+                {isBsdMode ? 'BSD City Orbit' : 'Auto-Rotate Orbit'}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[#ff5500] font-mono font-bold text-xs bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200">
+                {rotateSpeed.toFixed(1)}x
+              </span>
               <button
                 type="button"
                 onClick={() => setShowRotateSlider(false)}
-                className="text-slate-400 hover:text-slate-700 text-xs px-1 rounded hover:bg-slate-100 transition"
+                className="text-slate-400 hover:text-slate-700 text-xs px-1.5 py-0.5 rounded hover:bg-slate-100 transition"
                 title="Hide controls"
               >
                 ✕
               </button>
             </div>
           </div>
-          <input
-            type="range"
-            min="0.2"
-            max="3.0"
-            step="0.1"
-            value={rotateSpeed}
-            onChange={e => {
-              const val = parseFloat(e.target.value);
-              setRotateSpeed(val);
-              try {
-                localStorage.setItem(ROTATE_SPEED_KEY, String(val));
-              } catch {}
-            }}
-            className="w-full accent-[#ff5500] h-1.5 bg-slate-200 rounded-lg cursor-pointer"
-          />
-          <div className="flex justify-between text-[9px] text-slate-400 mt-1 font-semibold">
-            <span>Slow (0.2x)</span>
-            <span>Normal (1.0x)</span>
-            <span>Fast (3.0x)</span>
+
+          {/* Speed slider */}
+          <div className="mb-2.5">
+            <input
+              type="range"
+              min="0.2"
+              max="3.0"
+              step="0.1"
+              value={rotateSpeed}
+              onChange={e => {
+                const val = parseFloat(e.target.value);
+                setRotateSpeed(val);
+                try {
+                  localStorage.setItem(ROTATE_SPEED_KEY, String(val));
+                } catch {}
+              }}
+              className="w-full accent-[#ff5500] h-1.5 bg-slate-200 rounded-lg cursor-pointer"
+            />
+            <div className="flex justify-between text-[9px] text-slate-400 mt-1 font-semibold">
+              <span>Slow (0.2x)</span>
+              <span>Normal (1.0x)</span>
+              <span>Fast (3.0x)</span>
+            </div>
           </div>
+
           {/* Tombol Smooth Ease-In-Out Zoom Saat Orbit */}
-          <div className="mt-2.5 pt-2 border-t border-slate-200/80 flex items-center justify-between gap-1.5">
-            <button
-              type="button"
-              onClick={() => {
-                const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? (isBsdMode ? 26000 : 2000);
-                triggerSmoothOrbitZoom(cur * 0.7, 950);
-              }}
-              className="flex-1 rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white py-1 text-[10.5px] font-medium text-slate-700 transition"
-              title="Smooth zoom in"
-            >
-              🔍+ Zoom In
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? (isBsdMode ? 26000 : 2000);
-                triggerSmoothOrbitZoom(cur * 1.45, 1100);
-              }}
-              className="flex-1 rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white py-1 text-[10.5px] font-medium text-slate-700 transition"
-              title="Smooth zoom out"
-            >
-              🔍− Zoom Out
-            </button>
-            <button
-              type="button"
-              onClick={() => triggerSmoothOrbitZoom(isBsdMode ? 35000 : 9500, 1600)}
-              className="rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white px-2 py-1 text-[10.5px] font-medium text-slate-700 transition"
-              title="Zoom out to view the surrounding area"
-            >
-              Wide
-            </button>
+          <div className="pt-2 border-t border-slate-200/80">
+            <div className="flex items-center justify-between gap-1.5 mb-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? (isBsdMode ? 26000 : 2000);
+                  triggerSmoothOrbitZoom(cur * 0.7, 950);
+                }}
+                className="flex-1 rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white py-1 text-[10.5px] font-medium text-slate-700 transition active:scale-95 text-center shadow-sm"
+                title="Smooth zoom in"
+              >
+                🔍+ In
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? (isBsdMode ? 26000 : 2000);
+                  triggerSmoothOrbitZoom(cur * 1.45, 1100);
+                }}
+                className="flex-1 rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white py-1 text-[10.5px] font-medium text-slate-700 transition active:scale-95 text-center shadow-sm"
+                title="Smooth zoom out"
+              >
+                🔍− Out
+              </button>
+              <button
+                type="button"
+                onClick={() => triggerSmoothOrbitZoom(isBsdMode ? 35000 : 9500, 1600)}
+                className="rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white px-2.5 py-1 text-[10.5px] font-medium text-slate-700 transition active:scale-95 shadow-sm"
+                title="Zoom out to view the surrounding area"
+              >
+                Wide
+              </button>
+            </div>
+
+            {/* Auto-rotate after intro finishes */}
+            <label className="flex items-center gap-2 cursor-pointer text-[10.5px] text-slate-600 hover:text-slate-900 transition pt-1.5 border-t border-slate-200/60">
+              <input
+                type="checkbox"
+                checked={autoRotateOnArrival}
+                onChange={event => {
+                  const checked = event.target.checked;
+                  autoArrivalRef.current = checked;
+                  setAutoRotateOnArrival(checked);
+                  persistPreferences(hub, checked);
+                }}
+                className="accent-orange-600 rounded cursor-pointer"
+              />
+              <span>Auto-rotate after intro finishes</span>
+            </label>
           </div>
         </div>
       )}
 </div>      {/* Loading overlay */}      {status === 'loading' && <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md">
 <div className="rounded-2xl border border-white/20 bg-slate-950/70 p-6 text-center shadow-[0_16px_50px_rgba(0,0,0,0.6)] backdrop-blur-2xl ring-1 ring-white/10">
-<div className="text-sm font-bold text-white">Loading Cesium 3D Globe...</div>
+<div className="text-sm font-bold text-white">Loading epicyoung 3D Globe...</div>
 <div className="mt-1.5 text-xs text-white/60">              Preparing the globe and map controls            </div>
 </div>
 </div>}      {/* Error overlay */}      {status === 'error' && <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md">
 <div className="w-full max-w-lg rounded-2xl border border-red-500/30 bg-slate-950/85 p-6 shadow-2xl backdrop-blur-2xl ring-1 ring-white/10">
-<h2 className="mb-2 text-sm font-bold text-red-300">Failed to load the Cesium view</h2>
+<h2 className="mb-2 text-sm font-bold text-red-300">Failed to load the epicyoung view</h2>
 <p className="mb-4 text-xs leading-relaxed text-white/60">{error}</p>
 <div className="flex justify-end gap-2">
-<Link href="/" className="rounded-xl px-4 py-2 text-xs font-semibold text-white/70 hover:text-white border border-white/10 hover:bg-white/10 transition">                Back              </Link>
+<Link href="/epicyoung" className="rounded-xl px-4 py-2 text-xs font-semibold text-white/70 hover:text-white border border-white/10 hover:bg-white/10 transition">                Back              </Link>
 </div>
 </div>
 </div>}    </div>;

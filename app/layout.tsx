@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cesium Globe Showcase | Spindonesia Tiles",
-  description: "3D Globe & Map Showcase with CesiumJS and Glassmorphism",
+  title: "epicyoung 3D Showcase | Spindonesia Tiles",
+  description: "3D Globe & Map Showcase with epicyoung and Glassmorphism",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

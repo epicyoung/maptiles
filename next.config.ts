@@ -8,7 +8,10 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   async redirects() {
-    return [{ source: "/", destination: "/cesium", permanent: false }];
+    return [
+      { source: "/", destination: "/epicyoung", permanent: false },
+      { source: "/cesium", destination: "/epicyoung", permanent: true },
+    ];
   },
   turbopack: {
     root: __dirname,
