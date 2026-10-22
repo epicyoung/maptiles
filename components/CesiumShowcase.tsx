@@ -285,7 +285,15 @@ async function searchPlacesOmnibox(query: string, biasLat: number, biasLon: numb
   }
   return results;
 }
-const CSS = `@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap');.cesium-showcase, .cesium-showcase * {  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;}.cesium-showcase {  font-weight: 400;  position: relative;  width: 100%;  height: 100vh;  overflow: hidden;  background: #040814;}.cesium-showcase h1 {  font-weight: 500 !important;}.cesium-showcase .map {  position: absolute;  inset: 0;}.cesium-showcase.pick-cursor .map,.cesium-showcase.pick-cursor .map canvas {  cursor: crosshair !important;}.cesium-showcase .pins {  position: absolute;  inset: 0;  pointer-events: none;  z-index: 10;  overflow: hidden;}.cesium-showcase .epicyoung-brand { position: fixed !important; top: 20px !important; right: 28px !important; left: auto !important; width: 132px !important; height: auto !important; z-index: 40; object-fit: contain; filter: brightness(0) invert(1) drop-shadow(0 2px 5px rgba(0,0,0,.85)); pointer-events: none; }.cesium-showcase img[src="/epicyoung-logo.png"] { display: none !important; }.cesium-showcase .pole {  position: absolute;  transform: translate(-50%, -100%);  display: flex;  flex-direction: column;  align-items: center;  pointer-events: auto;  cursor: pointer;  transition: transform .25s cubic-bezier(0.16, 1, 0.3, 1), opacity .25s ease;}.cesium-showcase .pole:hover {  transform: translate(-50%, -100%) scale(1.08);  z-index: 20;}.cesium-showcase .pole.hub { z-index: 100; }.cesium-showcase .pole.active { z-index: 110; }.cesium-showcase .pole.hub:hover, .cesium-showcase .pole.active:hover { z-index: 120; }.cesium-showcase .settings-panel {  position: relative; width: 100%; margin-top: 0;  border: 1px solid rgba(255,255,255,.7); border-radius: 16px;  background: rgba(255,255,255,.72); color: #1e293b; backdrop-filter: blur(24px);  padding: 12px;}.cesium-showcase .settings-panel.collapsed { padding: 12px; }.cesium-showcase .layer-switch {  display: flex; align-items: center; justify-content: space-between; gap: 12px;  width: 100%; padding: 12px 0; text-align: left; font-size: 12px;  border-bottom: 1px solid rgba(100,116,139,.15); cursor: pointer;}.cesium-showcase .layer-switch:focus-visible { outline: 2px solid #ff7700; outline-offset: 4px; }.cesium-showcase .switch-track { width: 30px; height: 18px; border-radius: 20px; background: #94a3b8; padding: 3px; flex-shrink: 0; }.cesium-showcase .switch-track.on { background: #ea580c; }.cesium-showcase .switch-track span { display: block; width: 12px; height: 12px; border-radius: 50%; background: white; transition: transform .2s; }.cesium-showcase .switch-track.on span { transform: translateX(12px); }.cesium-showcase.theme-dark .settings-panel,.cesium-showcase.theme-dark .navigation-panel {  background: rgba(15,23,42,.82); color: #f1f5f9; border-color: rgba(255,255,255,.18);}.cesium-showcase.theme-dark .navigation-panel [class*="text-slate-800"],.cesium-showcase.theme-dark .navigation-panel [class*="text-slate-700"] { color: #e2e8f0; }.cesium-showcase.theme-dark .navigation-panel [class*="text-slate-500"] { color: #cbd5e1; }.cesium-showcase.theme-dark .navigation-panel [class*="bg-white/"] { background-color: rgba(15,23,42,.72); border-color: rgba(255,255,255,.2); }@media (max-width: 700px) {  .cesium-showcase .settings-panel { margin-top: 0; }}/* Logo pin: pengganti label teks, rasio 3:2 atau 4:3 */.cesium-showcase .pole-logo {  background: rgba(255, 255, 255, 0.82);  backdrop-filter: blur(20px);  -webkit-backdrop-filter: blur(20px);  border: 1px solid rgba(255, 255, 255, 0.95);  border-radius: 8px;  padding: 4px;  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.22), inset 0 1px 0 0 rgba(255, 255, 255, 0.95);  transition: all .25s cubic-bezier(0.16, 1, 0.3, 1);  overflow: hidden;}.cesium-showcase .pole-logo.ratio-3-2 { width: 96px; aspect-ratio: 3 / 2; }.cesium-showcase .pole-logo.ratio-4-3 { width: 88px; aspect-ratio: 4 / 3; }.cesium-showcase .pole-logo img {  display: block;  width: 100%;  height: 100%;  object-fit: contain;  border-radius: 5px;}.cesium-showcase .pole.hub .pole-logo { width: 108px; }.cesium-showcase .pole.active .pole-logo { border-color: #ffa044; box-shadow: 0 0 0 2px rgba(255, 85, 0, 0.45); }/* Glassmorphic 3D Pole Pin Badges (Frosted White Glass) */.cesium-showcase .pole-label {  display: flex;  flex-direction: column;  align-items: center;  gap: 2px;  white-space: nowrap;  max-width: 240px;  background: rgba(255, 255, 255, 0.72);  backdrop-filter: blur(20px);  -webkit-backdrop-filter: blur(20px);  color: #0f172a;  padding: 6px 14px;  border-radius: 5px;  border: 1px solid rgba(255, 255, 255, 0.9);  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.95);  font-size: 12px;  font-weight: 400;  letter-spacing: 0.01em;  transition: all .25s cubic-bezier(0.16, 1, 0.3, 1);}.cesium-showcase .pole.hub .pole-label {  background: rgba(255, 255, 255, 0.88);  backdrop-filter: blur(20px);  -webkit-backdrop-filter: blur(20px);  border: 1.5px solid rgba(255, 140, 0, 0.8);  color: #0f172a;  font-weight: 500;  border-radius: 5px !important;  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22), 0 0 18px rgba(255, 150, 0, 0.4);}.cesium-showcase .pole.active .pole-label {  background: rgba(255, 85, 0, 0.95) !important;  backdrop-filter: blur(20px);  -webkit-backdrop-filter: blur(20px);  color: #ffffff !important;  border: 1.5px solid rgba(255, 200, 140, 0.9) !important;  border-radius: 5px !important;  padding: 7px 18px !important;  font-weight: 500 !important;  box-shadow: 0 10px 32px rgba(255, 85, 0, 0.55), 0 0 24px rgba(255, 85, 0, 0.5) !important;}.cesium-showcase .pole-sub {  font-size: 10.5px;  color: #475569;  font-weight: 400;  display: block;}.cesium-showcase .pole.active .pole-sub {  display: block;  color: #fff3e0 !important;  opacity: 1;}.cesium-showcase .pole.hub .pole-sub {  display: block;  color: #c2410c;  font-weight: 500;}.cesium-showcase .pole-line {  width: 2px;  height: 36px;  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.4) 100%);  box-shadow: 0 0 8px rgba(0,0,0,0.35);}.cesium-showcase .pole.hub .pole-line {  background: linear-gradient(180deg, #ff9900 0%, rgba(255,153,0,0.4) 100%);  height: 48px;  box-shadow: 0 0 10px rgba(255,153,0,0.6);}.cesium-showcase .pole.active .pole-line {  background: linear-gradient(180deg, #ff7700 0%, #ff3300 100%) !important;  box-shadow: 0 0 12px rgba(255,85,0,0.9) !important;  height: 46px;}.cesium-showcase .pole-dot {  width: 12px;  height: 12px;  border-radius: 50%;  background: #ffffff;  border: 2px solid #0f172a;  box-shadow: 0 0 8px rgba(0,0,0,0.4);}.cesium-showcase .pole.hub .pole-dot {  width: 16px;  height: 16px;  background: #ff9900;  border-color: #ffffff;  box-shadow: 0 0 0 4px rgba(255, 153, 0, 0.4), 0 0 14px rgba(255, 153, 0, 0.8);}.cesium-showcase .pole.active .pole-dot {  width: 15px;  height: 15px;  background: #ff5500 !important;  border-color: #ffffff !important;  box-shadow: 0 0 0 4px rgba(255, 85, 0, 0.4), 0 0 14px rgba(255, 85, 0, 0.8) !important;}.cesium-showcase .pole-label > span:first-child { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }/* Custom Glassmorphism Scrollbar */.cesium-glass-scroll::-webkit-scrollbar {  width: 5px;}.cesium-glass-scroll::-webkit-scrollbar-track {  background: transparent;}.cesium-glass-scroll::-webkit-scrollbar-thumb {  background: rgba(0, 0, 0, 0.2);  border-radius: 999px;}.cesium-glass-scroll::-webkit-scrollbar-thumb:hover {  background: rgba(0, 0, 0, 0.35);}/* Dark Glassmorphism Theme Overrides */.cesium-showcase.theme-dark {  background: #020409;}.cesium-showcase.theme-dark .pole-label {  background: rgba(15, 23, 42, 0.78);  border: 1px solid rgba(255, 255, 255, 0.18);  color: #f1f5f9;  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);}.cesium-showcase.theme-dark .pole.hub .pole-label {  background: rgba(26, 32, 53, 0.92);  border: 1.5px solid rgba(255, 140, 0, 0.9);  color: #ffedd5;  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), 0 0 18px rgba(255, 150, 0, 0.45);}.cesium-showcase.theme-dark .pole-sub {  color: #94a3b8;}.cesium-showcase.theme-dark .pole.hub .pole-sub {  color: #fb923c;}.cesium-showcase.theme-dark .cesium-glass-scroll::-webkit-scrollbar-thumb {  background: rgba(255, 255, 255, 0.2);}.cesium-showcase.theme-dark .cesium-glass-scroll::-webkit-scrollbar-thumb:hover {  background: rgba(255, 255, 255, 0.35);}/* Hide Cesium ion logo but keep data attribution */.cesium-showcase .cesium-credit-logoContainer { display: none !important; }`;
+const CSS = `@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap');.cesium-showcase, .cesium-showcase * {  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;}.cesium-showcase {  font-weight: 400;  position: relative;  width: 100%;  height: 100vh;  overflow: hidden;  background: #040814;}.cesium-showcase h1 {  font-weight: 500 !important;}.cesium-showcase .map {  position: absolute;  inset: 0;}.cesium-showcase.pick-cursor .map,.cesium-showcase.pick-cursor .map canvas {  cursor: crosshair !important;}.cesium-showcase .pins {  position: absolute;  inset: 0;  pointer-events: none;  z-index: 10;  overflow: hidden;}.cesium-showcase .epicyoung-brand { position: fixed !important; top: 20px !important; right: 28px !important; left: auto !important; width: 132px !important; height: auto !important; z-index: 40; object-fit: contain; filter: brightness(0) invert(1) drop-shadow(0 2px 5px rgba(0,0,0,.85)); pointer-events: none; }.cesium-showcase img[src="/epicyoung-logo.png"] { display: none !important; }.cesium-showcase .pole {  position: absolute;  transform: translate(-50%, -100%);  display: flex;  flex-direction: column;  align-items: center;  pointer-events: auto;  cursor: pointer;  transition: transform .25s cubic-bezier(0.16, 1, 0.3, 1), opacity .25s ease;}.cesium-showcase .pole:hover {  transform: translate(-50%, -100%) scale(1.08);  z-index: 20;}.cesium-showcase .pole.hub { z-index: 100; }.cesium-showcase .pole.active { z-index: 110; }.cesium-showcase .pole.hub:hover, .cesium-showcase .pole.active:hover { z-index: 120; }.cesium-showcase .settings-panel {  position: relative; width: 100%; margin-top: 0;  border: 1px solid rgba(255,255,255,.7); border-radius: 16px;  background: rgba(255,255,255,.72); color: #1e293b; backdrop-filter: blur(24px);  padding: 12px;}.cesium-showcase .settings-panel.collapsed { padding: 12px; }.cesium-showcase .layer-switch {  display: flex; align-items: center; justify-content: space-between; gap: 12px;  width: 100%; padding: 12px 0; text-align: left; font-size: 12px;  border-bottom: 1px solid rgba(100,116,139,.15); cursor: pointer;}.cesium-showcase .layer-switch:focus-visible { outline: 2px solid #ff7700; outline-offset: 4px; }.cesium-showcase .switch-track { width: 30px; height: 18px; border-radius: 20px; background: #94a3b8; padding: 3px; flex-shrink: 0; }.cesium-showcase .switch-track.on { background: #ea580c; }.cesium-showcase .switch-track span { display: block; width: 12px; height: 12px; border-radius: 50%; background: white; transition: transform .2s; }.cesium-showcase .switch-track.on span { transform: translateX(12px); }.cesium-showcase.theme-dark .settings-panel,.cesium-showcase.theme-dark .navigation-panel {  background: rgba(15,23,42,.82); color: #f1f5f9; border-color: rgba(255,255,255,.18);}.cesium-showcase.theme-dark .navigation-panel [class*="text-slate-800"],.cesium-showcase.theme-dark .navigation-panel [class*="text-slate-700"] { color: #e2e8f0; }.cesium-showcase.theme-dark .navigation-panel [class*="text-slate-500"] { color: #cbd5e1; }.cesium-showcase.theme-dark .navigation-panel [class*="bg-white/"] { background-color: rgba(15,23,42,.72); border-color: rgba(255,255,255,.2); }@media (max-width: 700px) {  .cesium-showcase .settings-panel { margin-top: 0; }}/* Logo pin: pengganti label teks, rasio 3:2 atau 4:3 */.cesium-showcase .pole-logo {  background: rgba(255, 255, 255, 0.82);  backdrop-filter: blur(20px);  -webkit-backdrop-filter: blur(20px);  border: 1px solid rgba(255, 255, 255, 0.95);  border-radius: 8px;  padding: 4px;  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.22), inset 0 1px 0 0 rgba(255, 255, 255, 0.95);  transition: all .25s cubic-bezier(0.16, 1, 0.3, 1);  overflow: hidden;}.cesium-showcase .pole-logo.ratio-3-2 { width: 96px; aspect-ratio: 3 / 2; }.cesium-showcase .pole-logo.ratio-4-3 { width: 88px; aspect-ratio: 4 / 3; }.cesium-showcase .pole-logo img {  display: block;  width: 100%;  height: 100%;  object-fit: contain;  border-radius: 5px;}.cesium-showcase .pole.hub .pole-logo { width: 108px; }.cesium-showcase .pole.active .pole-logo { border-color: #ffa044; box-shadow: 0 0 0 2px rgba(255, 85, 0, 0.45); }/* Glassmorphic 3D Pole Pin Badges (Frosted White Glass) */.cesium-showcase .pole-label {  display: flex;  flex-direction: column;  align-items: center;  gap: 2px;  white-space: nowrap;  max-width: 240px;  background: rgba(255, 255, 255, 0.9);  backdrop-filter: blur(20px);  -webkit-backdrop-filter: blur(20px);  color: #0f172a;  padding: 6px 14px;  border-radius: 5px;  border: 1px solid rgba(255, 255, 255, 0.9);  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.95);  font-size: 12px;  font-weight: 400;  letter-spacing: 0.01em;  transition: all .25s cubic-bezier(0.16, 1, 0.3, 1);}.cesium-showcase .pole.hub .pole-label {  background: rgba(255, 255, 255, 0.96);  backdrop-filter: blur(20px);  -webkit-backdrop-filter: blur(20px);  border: 1.5px solid rgba(255, 140, 0, 0.8);  color: #0f172a;  font-weight: 500;  border-radius: 5px !important;  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22), 0 0 18px rgba(255, 150, 0, 0.4);}.cesium-showcase .pole.active .pole-label {  background: rgba(255, 85, 0, 0.97) !important;  backdrop-filter: blur(20px);  -webkit-backdrop-filter: blur(20px);  color: #ffffff !important;  border: 1.5px solid rgba(255, 200, 140, 0.9) !important;  border-radius: 5px !important;  padding: 7px 18px !important;  font-weight: 500 !important;  box-shadow: 0 10px 32px rgba(255, 85, 0, 0.55), 0 0 24px rgba(255, 85, 0, 0.5) !important;}.cesium-showcase .pole-sub {  font-size: 10.5px;  color: #475569;  font-weight: 400;  display: block;}.cesium-showcase .pole.active .pole-sub {  display: block;  color: #ffffff !important;  opacity: 1;}.cesium-showcase .pole.hub .pole-sub {  display: block;  color: #c2410c;  font-weight: 500;}.cesium-showcase .pole-line {  width: 2px;  height: 36px;  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.4) 100%);  box-shadow: 0 0 8px rgba(0,0,0,0.35);}.cesium-showcase .pole.hub .pole-line {  background: linear-gradient(180deg, #ff9900 0%, rgba(255,153,0,0.4) 100%);  height: 48px;  box-shadow: 0 0 10px rgba(255,153,0,0.6);}.cesium-showcase .pole.active .pole-line {  background: linear-gradient(180deg, #ff7700 0%, #ff3300 100%) !important;  box-shadow: 0 0 12px rgba(255,85,0,0.9) !important;  height: 46px;}.cesium-showcase .pole-dot {  width: 12px;  height: 12px;  border-radius: 50%;  background: #ffffff;  border: 2px solid #0f172a;  box-shadow: 0 0 8px rgba(0,0,0,0.4);}.cesium-showcase .pole.hub .pole-dot {  width: 16px;  height: 16px;  background: #ff9900;  border-color: #ffffff;  box-shadow: 0 0 0 4px rgba(255, 153, 0, 0.4), 0 0 14px rgba(255, 153, 0, 0.8);}.cesium-showcase .pole.active .pole-dot {  width: 15px;  height: 15px;  background: #ff5500 !important;  border-color: #ffffff !important;  box-shadow: 0 0 0 4px rgba(255, 85, 0, 0.4), 0 0 14px rgba(255, 85, 0, 0.8) !important;}.cesium-showcase .pole-label > span:first-child { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }/* Custom Glassmorphism Scrollbar */.cesium-glass-scroll::-webkit-scrollbar {  width: 5px;}.cesium-glass-scroll::-webkit-scrollbar-track {  background: transparent;}.cesium-glass-scroll::-webkit-scrollbar-thumb {  background: rgba(0, 0, 0, 0.2);  border-radius: 999px;}.cesium-glass-scroll::-webkit-scrollbar-thumb:hover {  background: rgba(0, 0, 0, 0.35);}/* Dark Glassmorphism Theme Overrides */.cesium-showcase.theme-dark {  background: #020409;}.cesium-showcase.theme-dark .pole-label {  background: rgba(15, 23, 42, 0.92);  border: 1px solid rgba(255, 255, 255, 0.18);  color: #f1f5f9;  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);}.cesium-showcase.theme-dark .pole.hub .pole-label {  background: rgba(26, 32, 53, 0.92);  border: 1.5px solid rgba(255, 140, 0, 0.9);  color: #ffedd5;  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), 0 0 18px rgba(255, 150, 0, 0.45);}.cesium-showcase.theme-dark .pole-sub {  color: #94a3b8;}.cesium-showcase.theme-dark .pole.hub .pole-sub {  color: #fb923c;}.cesium-showcase.theme-dark .cesium-glass-scroll::-webkit-scrollbar-thumb {  background: rgba(255, 255, 255, 0.2);}.cesium-showcase.theme-dark .cesium-glass-scroll::-webkit-scrollbar-thumb:hover {  background: rgba(255, 255, 255, 0.35);}/* Hide Cesium ion logo but keep data attribution */.cesium-showcase .cesium-credit-logoContainer { display: none !important; }
+/* --- Pins are native buttons now: reset UA styles and expose keyboard focus --- */.cesium-showcase .pole {  background: transparent;  border: 0;  padding: 0;  margin: 0;  font: inherit;  color: inherit;  text-align: center;  -webkit-tap-highlight-color: transparent;}.cesium-showcase .pole-logo,.cesium-showcase .pole-line,.cesium-showcase .pole-dot { display: block; }.cesium-showcase .pole:focus-visible {  outline: 3px solid #c2410c;  outline-offset: 6px;  border-radius: 10px;}.cesium-showcase.theme-dark .pole:focus-visible { outline-color: #fdba74; }
+/* --- Universal focus ring for every control in the showcase --- */.cesium-showcase :focus-visible {  outline: 2px solid #c2410c;  outline-offset: 2px;  border-radius: 6px;}.cesium-showcase.theme-dark :focus-visible { outline-color: #fdba74; }
+/* --- Touch targets: 32px on pointer devices, 44px on touch --- */.cesium-showcase .place-action {  display: flex;  align-items: center;  justify-content: center;  flex-shrink: 0;  width: 2rem;  height: 2rem;  min-width: 2rem;  border-radius: .5rem;  transition: background-color .15s ease, color .15s ease;}@media (pointer: coarse) {  .cesium-showcase .place-action {    width: 2.75rem;    height: 2.75rem;    min-width: 2.75rem;  }}
+/* --- Theme tokens: one source of truth for surface, text, border, accent --- */.cesium-showcase {  --app-surface: rgba(255,255,255,.95);  --app-surface-muted: rgba(241,245,249,.9);  --app-text: #0f172a;  --app-text-muted: #475569;  --app-border: rgba(255,255,255,.8);  --app-accent: #c2410c;}.cesium-showcase.theme-dark {  --app-surface: rgba(15,23,42,.96);  --app-surface-muted: rgba(255,255,255,.1);  --app-text: #f1f5f9;  --app-text-muted: #cbd5e1;  --app-border: rgba(255,255,255,.2);  --app-accent: #fdba74;}.cesium-showcase .floating-panel {  background: var(--app-surface);  border-color: var(--app-border);  color: var(--app-text);}
+/* --- Orbit panel + record dialog in dark mode --- */.cesium-showcase.theme-dark .orbit-panel {  background: var(--app-surface);  border-color: var(--app-border);  color: var(--app-text);  box-shadow: 0 16px 50px rgba(0,0,0,.55);}.cesium-showcase.theme-dark .orbit-panel .orbit-heading { color: var(--app-text); }.cesium-showcase.theme-dark .orbit-panel .orbit-muted { color: var(--app-text-muted); }.cesium-showcase.theme-dark .orbit-panel .orbit-divider { border-color: rgba(255,255,255,.16); }.cesium-showcase.theme-dark .orbit-panel .orbit-secondary {  background: var(--app-surface-muted);  border-color: rgba(255,255,255,.22);  color: var(--app-text);}.cesium-showcase.theme-dark .orbit-panel .orbit-secondary:hover { background: rgba(255,255,255,.2); color: #ffffff; }.cesium-showcase.theme-dark .orbit-panel .orbit-speed-chip {  background: rgba(249,115,22,.18);  border-color: rgba(251,146,60,.45);  color: #fdba74;}.cesium-showcase.theme-dark .record-dialog .record-title { color: #f8fafc; }.cesium-showcase.theme-dark .record-dialog .record-copy,.cesium-showcase.theme-dark .record-dialog .record-option { color: var(--app-text-muted); }.cesium-showcase.theme-dark .record-dialog .record-cancel { color: var(--app-text); }.cesium-showcase.theme-dark .record-dialog .record-cancel:hover { background: rgba(255,255,255,.12); }
+/* --- Orbit speed control: orange thumb with a visible boundary on both themes --- */.cesium-showcase .orbit-accent { color: #c2410c; }.cesium-showcase.theme-dark .orbit-accent { color: #fdba74; }.cesium-showcase .orbit-slider {  -webkit-appearance: none;  appearance: none;  height: 24px;  padding: 9px 0;  border-radius: 999px;  background: linear-gradient(#e2e8f0, #e2e8f0) center / 100% 6px no-repeat;  cursor: pointer;}.cesium-showcase .orbit-slider::-webkit-slider-thumb {  -webkit-appearance: none;  appearance: none;  width: 18px;  height: 18px;  border: 0;  border-radius: 50%;  background: #ff5500;  box-shadow: 0 0 0 2px #ffffff, 0 0 0 3px rgba(28, 15, 4, 0.4);}.cesium-showcase .orbit-slider::-moz-range-thumb {  width: 18px;  height: 18px;  border: 0;  border-radius: 50%;  background: #ff5500;  box-shadow: 0 0 0 2px #ffffff, 0 0 0 3px rgba(28, 15, 4, 0.4);}.cesium-showcase.theme-dark .orbit-slider { background: linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.22)) center / 100% 6px no-repeat; }
+/* --- Accent text that keeps 4.5:1 on both themes --- */.cesium-showcase .app-accent-text { color: #9a3412; }.cesium-showcase.theme-dark .app-accent-text { color: #fdba74; }.cesium-showcase.theme-dark .navigation-panel .text-red-600,.cesium-showcase.theme-dark .navigation-panel .text-rose-600 { color: #fda4af; }.cesium-showcase.theme-dark .navigation-panel .text-emerald-700 { color: #6ee7b7; }
+/* --- Respect the OS reduced-motion preference --- */@media (prefers-reduced-motion: reduce) {  .cesium-showcase *, .cesium-showcase *::before, .cesium-showcase *::after {    animation-duration: .01ms !important;    animation-iteration-count: 1 !important;    transition-duration: .01ms !important;    scroll-behavior: auto !important;  }}`;
 type Status = 'loading' | 'ready' | 'error';
 let cesiumLoader: Promise<any> | null = null;
 function loadCesium(): Promise<any> {
@@ -355,6 +363,61 @@ function getFreeRoamSphere(viewer: any, Cesium: any, defaultHub: {
 }
 const ROTATE_SPEED_KEY = 'cesium-showcase.rotate-speed.v1';
 const BSD_RANGE_KEY = 'cesium-showcase.bsd-range.v1';
+/**
+ * Screen-space declutter for toll-road labels.
+ * Labels that would collide are nudged vertically (up first), and hidden when
+ * no free slot is available, so names stay readable instead of stacking.
+ */
+function declutterTollLabels(viewer: any, C: any, labels: any) {
+  if (!viewer || viewer.isDestroyed() || !labels || !labels.show) return;
+  const scene = viewer.scene;
+  const camera = viewer.camera;
+  const canvasWidth = scene.canvas.clientWidth;
+  const canvasHeight = scene.canvas.clientHeight;
+  const placed: {
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+  }[] = [];
+  const verticalOffsets = [0, -22, 22, -44, 44, -66, 66];
+  for (let i = 0; i < labels.length; i++) {
+    const label = labels.get(i);
+    if (!label?.position) continue;
+    if (C.Cartesian3.distance(camera.positionWC, label.position) > 60000) {
+      if (label.show !== false) label.show = false;
+      continue;
+    }
+    const screen = C.SceneTransforms.worldToWindowCoordinates(scene, label.position);
+    if (!screen || screen.x < -80 || screen.y < -80 || screen.x > canvasWidth + 80 || screen.y > canvasHeight + 80) {
+      if (label.show !== false) label.show = false;
+      continue;
+    }
+    const boxWidth = Math.max(48, String(label.text).length * 6.4) + 12;
+    const boxHeight = 22;
+    let hasSlot = false;
+    for (const dy of verticalOffsets) {
+      const box = {
+        x1: screen.x - boxWidth / 2,
+        y1: screen.y + dy - boxHeight,
+        x2: screen.x + boxWidth / 2,
+        y2: screen.y + dy
+      };
+      const overlaps = placed.some(other => !(box.x2 < other.x1 || box.x1 > other.x2 || box.y2 < other.y1 || box.y1 > other.y2));
+      if (!overlaps) {
+        if (label.pixelOffset.x !== 0 || label.pixelOffset.y !== dy) {
+          label.pixelOffset = new C.Cartesian2(0, dy);
+        }
+        if (label.show !== true) label.show = true;
+        placed.push(box);
+        hasSlot = true;
+        break;
+      }
+    }
+    if (!hasSlot && label.show !== false) label.show = false;
+  }
+}
+
 export interface CesiumShowcaseProps {
   initialMode?: 'default' | 'bsd';
 }
@@ -393,7 +456,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
   const searchCacheRef = useRef(new Map<string, StartPoint[]>());
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<any>(null);
-  const pinRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const pinRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const routeEntitiesRef = useRef<any[]>([]);
   const trailEntityRef = useRef<any>(null);
   const trailAnimRef = useRef<number | null>(null);
@@ -423,13 +486,11 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
   const [showBsd, setShowBsd] = useState(true);
   const [showRailways, setShowRailways] = useState(false);
   const [showTolls, setShowTolls] = useState(true);
-  const [tollReady, setTollReady] = useState(false);
-  const [tollCount, setTollCount] = useState(0);
-  const [tollLabelCount, setTollLabelCount] = useState(0);
   const [tollError, setTollError] = useState('');
   const [showTollLabels, setShowTollLabels] = useState(!isBsdMode);
   const tollCollectionRef = useRef<any>(null);
   const tollLabelsRef = useRef<any>(null);
+  const tollDeclutterCleanupRef = useRef<(() => void) | null>(null);
   const tollVisibilityRef = useRef({ roads: true, labels: !isBsdMode });
   const [showDistricts, setShowDistricts] = useState(false);
   const [showEsriLabels, setShowEsriLabels] = useState(false);
@@ -451,6 +512,32 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
   const [setupMessage, setSetupMessage] = useState('');
   const placePickIdRef = useRef<string | null>(null);
   const [dragPlaceId, setDragPlaceId] = useState<string | null>(null);
+  const [placeEditError, setPlaceEditError] = useState<{
+    lat?: string;
+    lon?: string;
+  } | null>(null);
+  const editLatRef = useRef<HTMLInputElement>(null);
+  const editLonRef = useRef<HTMLInputElement>(null);
+  const logoInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const importInputRef = useRef<HTMLInputElement>(null);
+  const sidebarToggleRef = useRef<HTMLButtonElement>(null);
+  const previousSidebarOpenRef = useRef<boolean | null>(null);
+  const recordDialogRef = useRef<HTMLDivElement>(null);
+  const recordTriggerRef = useRef<HTMLButtonElement>(null);
+  const prefersReducedMotionRef = useRef(false);
+  const pinPositionsRef = useRef<Record<string, {
+    x: number;
+    y: number;
+    visible: boolean;
+  }>>({});
+  const pinCameraRef = useRef('');
+  const dragPanelSizeRef = useRef({ width: 0, height: 0 });
+  const dragPanelFrameRef = useRef<number | null>(null);
+  const dragPanelMovedRef = useRef(false);
+  const dragPanelPendingRef = useRef<{
+    x: number;
+    y: number;
+  } | null>(null);
   const routeInfoRef = useRef<{
     distanceKm: number;
     durationMin: number;
@@ -485,6 +572,29 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
   const dragStartOffsetRef = useRef({ x: 0, y: 0 });
   const dragPanelPosRef = useRef<{ x: number; y: number } | null>(null);
 
+  /* Single source of truth for stopping the orbit (toolbar + panel Pause button). */
+  const stopAutoRotate = () => {
+    autoRotateRef.current = false;
+    setAutoRotate(false);
+    orbitRangeRef.current = null;
+    orbitPitchRef.current = null;
+    orbitTargetRef.current = null;
+    orbitAnimTargetRangeRef.current = null;
+    freeRoamSphereRef.current = null;
+  };
+
+  /* Reset returns the panel to its anchored default position and clears imperative drag styles. */
+  const resetPanelPosition = () => {
+    const panel = rotatePanelRef.current;
+    if (panel) {
+      panel.style.left = '';
+      panel.style.top = '';
+      panel.style.right = '';
+      panel.style.bottom = '';
+    }
+    setRotatePanelPos(null);
+  };
+
   const handlePanelDragStart = (e: React.PointerEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
     if (target.closest('button') || target.closest('input')) return;
@@ -492,43 +602,62 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
     if (!panel) return;
     const rect = panel.getBoundingClientRect();
     isDraggingPanelRef.current = true;
+    dragPanelMovedRef.current = false;
+    /* Cache the panel size once instead of reading offsetWidth/Height on every pointermove. */
+    dragPanelSizeRef.current = { width: rect.width, height: rect.height };
     dragStartOffsetRef.current = {
       x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      y: e.clientY - rect.top
     };
     dragPanelPosRef.current = { x: rect.left, y: rect.top };
-    panel.style.left = `${rect.left}px`;
-    panel.style.top = `${rect.top}px`;
-    panel.style.right = 'auto';
-    panel.style.bottom = 'auto';
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
 
   const handlePanelDragMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDraggingPanelRef.current || !rotatePanelRef.current) return;
-    const panel = rotatePanelRef.current;
-    const panelWidth = panel.offsetWidth;
-    const panelHeight = panel.offsetHeight;
-
+    const { width, height } = dragPanelSizeRef.current;
     const newX = e.clientX - dragStartOffsetRef.current.x;
     const newY = e.clientY - dragStartOffsetRef.current.y;
-
-    const clampedX = Math.max(12, Math.min(window.innerWidth - panelWidth - 12, newX));
-    const clampedY = Math.max(12, Math.min(window.innerHeight - panelHeight - 12, newY));
-
-    dragPanelPosRef.current = { x: clampedX, y: clampedY };
-    panel.style.left = `${clampedX}px`;
-    panel.style.top = `${clampedY}px`;
+    const clampedX = Math.max(12, Math.min(window.innerWidth - width - 12, newX));
+    const clampedY = Math.max(12, Math.min(window.innerHeight - height - 12, newY));
+    dragPanelMovedRef.current = true;
+    dragPanelPendingRef.current = { x: clampedX, y: clampedY };
+    /* Batch DOM writes to one per animation frame. */
+    if (dragPanelFrameRef.current !== null) return;
+    dragPanelFrameRef.current = requestAnimationFrame(() => {
+      dragPanelFrameRef.current = null;
+      const pending = dragPanelPendingRef.current;
+      const panel = rotatePanelRef.current;
+      if (!pending || !panel) return;
+      dragPanelPosRef.current = pending;
+      panel.style.right = 'auto';
+      panel.style.bottom = 'auto';
+      panel.style.left = `${pending.x}px`;
+      panel.style.top = `${pending.y}px`;
+    });
   };
 
   const handlePanelDragEnd = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (isDraggingPanelRef.current) {
-      isDraggingPanelRef.current = false;
-      if (dragPanelPosRef.current) setRotatePanelPos(dragPanelPosRef.current);
-      try {
-        (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-      } catch {/* ignore */}
+    if (!isDraggingPanelRef.current) return;
+    isDraggingPanelRef.current = false;
+    if (dragPanelFrameRef.current !== null) {
+      cancelAnimationFrame(dragPanelFrameRef.current);
+      dragPanelFrameRef.current = null;
     }
+    const pending = dragPanelPendingRef.current ?? dragPanelPosRef.current;
+    const panel = rotatePanelRef.current;
+    if (pending && panel && dragPanelMovedRef.current) {
+      panel.style.right = 'auto';
+      panel.style.bottom = 'auto';
+      panel.style.left = `${pending.x}px`;
+      panel.style.top = `${pending.y}px`;
+      setRotatePanelPos(pending);
+    }
+    dragPanelMovedRef.current = false;
+    dragPanelPendingRef.current = null;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {/* ignore */}
   }; /* Video recording states */
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
@@ -600,7 +729,83 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
       cancelAnimationFrame(id);
       window.removeEventListener('resize', resizePanels);
     };
-  }, [isBsdMode]);
+  }, [isBsdMode]); /* Respect the OS motion preference: no intro flight, no automatic orbit. */
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    prefersReducedMotionRef.current = query.matches;
+    const onChange = (event: MediaQueryListEvent) => {
+      prefersReducedMotionRef.current = event.matches;
+    };
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, []); /* When the sidebar closes, return focus to its toggle instead of leaving it on a hidden control. */
+  useEffect(() => {
+    const wasOpen = previousSidebarOpenRef.current;
+    previousSidebarOpenRef.current = sidebarOpen;
+    if (wasOpen === true && !sidebarOpen) sidebarToggleRef.current?.focus();
+  }, [sidebarOpen]); /* Record modal behaves as a real dialog: focus enters, stays inside, Escape closes, focus returns. */
+  useEffect(() => {
+    if (!showRecordModal) return;
+    const dialog = recordDialogRef.current;
+    const triggerElement = recordTriggerRef.current;
+    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focusables = () => Array.from(dialog?.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])') ?? []).filter(el => !el.hasAttribute('disabled') && el.tabIndex !== -1);
+    dialog?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setShowRecordModal(false);
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const items = focusables();
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      } else if (event.shiftKey && (active === first || active === dialog)) {
+        event.preventDefault();
+        last.focus();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      if (previouslyFocused && previouslyFocused !== document.body && document.contains(previouslyFocused) && !dialog?.contains(previouslyFocused)) {
+        previouslyFocused.focus();
+      } else {
+        triggerElement?.focus();
+      }
+    };
+  }, [showRecordModal]); /* Keep the dragged orbit panel inside the viewport after a resize or orientation change. */
+  useEffect(() => {
+    if (!rotatePanelPos) return;
+    const clampToViewport = () => {
+      const panel = rotatePanelRef.current;
+      if (!panel) return;
+      const width = panel.offsetWidth;
+      const height = panel.offsetHeight;
+      setRotatePanelPos(prev => {
+        if (!prev) return prev;
+        const x = Math.max(12, Math.min(window.innerWidth - width - 12, prev.x));
+        const y = Math.max(12, Math.min(window.innerHeight - height - 12, prev.y));
+        return x === prev.x && y === prev.y ? prev : {
+          x,
+          y
+        };
+      });
+    };
+    window.addEventListener('resize', clampToViewport);
+    window.addEventListener('orientationchange', clampToViewport);
+    clampToViewport();
+    return () => {
+      window.removeEventListener('resize', clampToViewport);
+      window.removeEventListener('orientationchange', clampToViewport);
+    };
+  }, [rotatePanelPos]);
   useEffect(() => {
     if (!containerRef.current) return;
     const container = containerRef.current;
@@ -661,7 +866,8 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
             preserveDrawingBuffer: true
           }
         }
-      }); /* 1. Map skins — semua provider dibuat sekali, hanya satu yang visible (lihat effect mapSkin) */
+      }); /* One attribution home: OSM data credit is merged into Cesium's bottom-left credit display. */
+      viewer.creditDisplay.addStaticCredit(new Cesium.Credit('<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>', true)); /* 1. Map skins — semua provider dibuat sekali, hanya satu yang visible (lihat effect mapSkin) */
       const skinLayers: Record<string, any> = {};
       const addSkin = (skin: string, options: any) => {
         skinLayers[skin] = viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider(options));
@@ -822,7 +1028,9 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
         layers.district.push(addLabel(district.name, ...district.coord));
       });
       layersRef.current = layers;
-      /* Pin projection each frame (includes custom searched POIs) */
+      /* Pin projection each frame (includes custom searched POIs).
+         Skip all DOM writes when the camera and the pin set are unchanged, and only
+         touch the elements whose projected position actually moved. */
       const onPostRender = viewer.scene.postRender.addEventListener(() => {
         const allLocs: {
           id: string;
@@ -830,22 +1038,38 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
           lat: number;
           height: number;
         }[] = [hubRef.current, ...poisRef.current];
-        const camHeight = viewer.camera.positionCartographic.height;
+        const camera = viewer.camera;
+        const camHeight = camera.positionCartographic.height;
+        const hidden = camHeight > 75000 || !showTooltipsRef.current;
+        const pos = camera.positionWC;
+        const signature = `${pos.x.toFixed(2)}|${pos.y.toFixed(2)}|${pos.z.toFixed(2)}|${camera.heading.toFixed(5)}|${camera.pitch.toFixed(5)}|${viewer.canvas.clientWidth}x${viewer.canvas.clientHeight}|${hidden ? 1 : 0}|${allLocs.map(loc => loc.id).join(',')}`;
+        if (signature === pinCameraRef.current) return;
+        pinCameraRef.current = signature;
         allLocs.forEach(loc => {
           const el = pinRefs.current[loc.id];
           if (!el) return;
-          if (camHeight > 75000 || !showTooltipsRef.current) {
-            el.style.display = 'none';
+          const cached = pinPositionsRef.current[loc.id];
+          if (hidden) {
+            if (!cached || cached.visible) {
+              el.style.display = 'none';
+              pinPositionsRef.current[loc.id] = { x: 0, y: 0, visible: false };
+            }
             return;
           }
           const cartesian = Cesium.Cartesian3.fromDegrees(loc.lon, loc.lat, loc.height);
           const canvasPos = Cesium.SceneTransforms.worldToWindowCoordinates(viewer.scene, cartesian);
           if (Cesium.defined(canvasPos)) {
-            el.style.left = `${canvasPos.x}px`;
-            el.style.top = `${canvasPos.y}px`;
-            el.style.display = 'flex';
-          } else {
+            const x = Math.round(canvasPos.x * 2) / 2;
+            const y = Math.round(canvasPos.y * 2) / 2;
+            if (!cached || !cached.visible || Math.abs(cached.x - x) > 0.5 || Math.abs(cached.y - y) > 0.5) {
+              el.style.left = `${x}px`;
+              el.style.top = `${y}px`;
+              if (!cached || !cached.visible) el.style.display = 'flex';
+              pinPositionsRef.current[loc.id] = { x, y, visible: true };
+            }
+          } else if (!cached || cached.visible) {
             el.style.display = 'none';
+            pinPositionsRef.current[loc.id] = { x: 0, y: 0, visible: false };
           }
         });
       });
@@ -890,13 +1114,26 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
       };
       (viewer as any).__startCinematicOrbit = startCinematicOrbit;
       const onIntroArrived = () => {
-        if (cancelled || !autoArrivalRef.current) return;
+        if (cancelled || !autoArrivalRef.current || prefersReducedMotionRef.current) return;
         startCinematicOrbit();
       };
       viewer.__onIntroArrived = onIntroArrived;
       function playGlobeIntro(C: any) {
         isIntroPlayingRef.current = true;
         const generation = ++introGenerationRef.current;
+        /* Reduced motion: land directly on the final framing without a fly-through. */
+        if (prefersReducedMotionRef.current) {
+          viewer.camera.setView({
+            destination: C.Cartesian3.fromDegrees(hubRef.current.lon, hubRef.current.lat - 0.012, 1050.0),
+            orientation: {
+              heading: C.Math.toRadians(0.0),
+              pitch: C.Math.toRadians(-38.0),
+              roll: 0.0
+            }
+          });
+          isIntroPlayingRef.current = false;
+          return;
+        }
         viewer.camera.setView({
           destination: C.Cartesian3.fromDegrees(hubRef.current.lon, hubRef.current.lat, 22000000.0),
           orientation: {
@@ -954,6 +1191,14 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
         const generation = ++introGenerationRef.current;
         const bsdCenter = C.Cartesian3.fromDegrees(BSD_CENTER_LON, BSD_CENTER_LAT, 0);
         const activeRange = userCustomRangeRef.current ?? BSD_ORBIT_RANGE;
+
+        /* Reduced motion: show the final orbit framing immediately. */
+        if (prefersReducedMotionRef.current) {
+          viewer.camera.lookAt(bsdCenter, new C.HeadingPitchRange(0.0, C.Math.toRadians(BSD_ORBIT_PITCH_DEG), activeRange));
+          viewer.camera.lookAtTransform(C.Matrix4.IDENTITY);
+          isIntroPlayingRef.current = false;
+          return;
+        }
 
         // 1. Luar angkasa: bumi terlihat bulat utuh dan tepat di tengah layar (altitude 22.000.000m)
         viewer.camera.setView({
@@ -1277,9 +1522,30 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
       viewer.scene.primitives.add(labels);
       labels.show = tollVisibilityRef.current.roads && tollVisibilityRef.current.labels;
       tollLabelsRef.current = labels;
-      setTollLabelCount(labelData.length);
-      setTollCount(lines.length);
-      setTollReady(true);
+      let lastDeclutter = 0;
+      let lastCameraSignature = '';
+      const refreshLabels = () => {
+        /* Throttle + skip idle frames: the camera can change every frame during orbit. */
+        const now = performance.now();
+        if (now - lastDeclutter < 120) return;
+        const cam = viewer.camera;
+        const signature = `${cam.positionWC.x.toFixed(1)},${cam.positionWC.y.toFixed(1)},${cam.positionWC.z.toFixed(1)},${cam.heading.toFixed(4)},${cam.pitch.toFixed(4)},${viewer.canvas.clientWidth}x${viewer.canvas.clientHeight}`;
+        if (signature === lastCameraSignature) return;
+        lastCameraSignature = signature;
+        lastDeclutter = now;
+        declutterTollLabels(viewer, C, labels);
+      };
+      viewer.camera.moveEnd.addEventListener(refreshLabels);
+      viewer.scene.postRender.addEventListener(refreshLabels);
+      window.addEventListener('resize', refreshLabels);
+      tollDeclutterCleanupRef.current = () => {
+        window.removeEventListener('resize', refreshLabels);
+        if (!viewer.isDestroyed()) {
+          viewer.camera.moveEnd.removeEventListener(refreshLabels);
+          viewer.scene.postRender.removeEventListener(refreshLabels);
+        }
+      };
+      refreshLabels();
       setTollError('');
     }).catch(err => {
       if (cancelled) return;
@@ -1287,16 +1553,21 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
     });
     return () => {
       cancelled = true;
+      tollDeclutterCleanupRef.current?.();
+      tollDeclutterCleanupRef.current = null;
     };
   }, [status]);
   useEffect(() => {
     if (tollCollectionRef.current) tollCollectionRef.current.show = showTolls;
     if (tollLabelsRef.current) tollLabelsRef.current.show = showTolls && showTollLabels;
+    const viewer = viewerRef.current;
+    if (showTolls && showTollLabels && viewer && tollLabelsRef.current) {
+      declutterTollLabels(viewer, (window as any).Cesium, tollLabelsRef.current);
+    }
   }, [showTolls, showTollLabels]); /* Load railway lines and stations from local GeoJSON. */
   const railwayEntitiesRef = useRef<any[]>([]);
   const [railwayStatus, setRailwayStatus] = useState<'idle' | 'loading' | 'ready' | 'missing' | 'error'>('idle');
   const [railwayError, setRailwayError] = useState('');
-  const [railwayCount, setRailwayCount] = useState(0);
   useEffect(() => {
     const viewer = viewerRef.current;
     const C = (window as any).Cesium;
@@ -1367,7 +1638,6 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
         createdRail.push(stEntity);
       }
       railwayEntitiesRef.current = createdRail;
-      setRailwayCount(railLines.length + seenStationKeys.size);
       setRailwayStatus('ready');
     }).catch((error: unknown) => {
       if (cancelled || viewer.isDestroyed()) return;
@@ -2048,6 +2318,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
     setHubEditorOpen(false);
     setDestSearchOpen(false);
     setEditingPlaceId(prev => prev === id ? null : id);
+    setPlaceEditError(null);
     setEditNameDraft(name);
     setEditLabelDraft(label);
     setEditLatDraft(String(lat));
@@ -2097,16 +2368,28 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
     lat: number;
     lon: number;
   }) => {
+    /* Validate the whole form first: never save a partial edit, never treat "" as 0. */
+    const latRaw = editLatDraft.trim();
+    const lonRaw = editLonDraft.trim();
+    const lat = Number(latRaw);
+    const lon = Number(lonRaw);
+    const latError = !latRaw ? 'Latitude is required.' : !Number.isFinite(lat) || Math.abs(lat) > 90 ? 'Latitude must be between -90 and 90.' : undefined;
+    const lonError = !lonRaw ? 'Longitude is required.' : !Number.isFinite(lon) || Math.abs(lon) > 180 ? 'Longitude must be between -180 and 180.' : undefined;
+    if (latError || lonError) {
+      setPlaceEditError({
+        lat: latError,
+        lon: lonError
+      });
+      (latError ? editLatRef : editLonRef).current?.focus();
+      return;
+    }
     const cleanName = editNameDraft.trim().slice(0, 60);
     const cleanLabel = editLabelDraft.trim().slice(0, 40);
     updateOverride(id, {
       name: cleanName === fallbackName.trim() ? '' : cleanName,
       label: cleanLabel === fallbackLabel.trim() ? '' : cleanLabel
     });
-    const lat = Number(editLatDraft);
-    const lon = Number(editLonDraft);
-    const valid = Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180;
-    const moved = valid && id !== 'hub' && (Math.abs(lat - origin.lat) > 1e-7 || Math.abs(lon - origin.lon) > 1e-7);
+    const moved = id !== 'hub' && (Math.abs(lat - origin.lat) > 1e-7 || Math.abs(lon - origin.lon) > 1e-7);
     if (moved) {
       if (activePoi === id) setFreeRoam();
       setPois(prev => prev.map(item => item.id === id ? {
@@ -2115,6 +2398,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
         lon
       } : item));
     }
+    setPlaceEditError(null);
     setEditingPlaceId(null);
   };
   const startPlacePick = (id: string) => {
@@ -2238,9 +2522,29 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
       }} placeholder={fallbackLabel || 'Pin subtitle (optional)'} className="w-full rounded-lg border border-slate-400/40 bg-white/90 px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500" />        {id === 'hub' ? <button type="button" onClick={() => {
         setEditingPlaceId(null);
         setMapPickMode('hub');
-      }} className="w-full rounded-lg border border-slate-400/50 bg-white/85 px-2 py-1 text-left hover:bg-white">            🎯 Pick a new location on the map          </button> : <div className="flex items-center gap-1">
-<input aria-label="Latitude" inputMode="decimal" value={editLatDraft} onChange={event => setEditLatDraft(event.target.value)} placeholder="lat" className="w-0 flex-1 rounded-lg border border-slate-400/40 bg-white/90 px-2 py-1 font-mono text-[11px] text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500" />
-<input aria-label="Longitude" inputMode="decimal" value={editLonDraft} onChange={event => setEditLonDraft(event.target.value)} placeholder="lon" className="w-0 flex-1 rounded-lg border border-slate-400/40 bg-white/90 px-2 py-1 font-mono text-[11px] text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500" />
+      }} className="w-full rounded-lg border border-slate-400/50 bg-white/85 px-2 py-1 text-left hover:bg-white">            🎯 Pick a new location on the map          </button> : <div className="flex items-start gap-1">
+<label className="min-w-0 flex-1">
+<span className="sr-only">{`Latitude for ${fallbackName}`}</span>
+<input ref={editLatRef} inputMode="decimal" value={editLatDraft} aria-invalid={placeEditError?.lat ? true : undefined} aria-describedby={placeEditError?.lat ? `place-lat-error-${id}` : undefined} onChange={event => {
+          setEditLatDraft(event.target.value);
+          if (placeEditError?.lat) setPlaceEditError(prev => prev ? {
+            ...prev,
+            lat: undefined
+          } : prev);
+        }} placeholder="lat" className={`w-full rounded-lg border bg-white/90 px-2 py-1 font-mono text-[11px] text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500 ${placeEditError?.lat ? 'border-rose-500' : 'border-slate-400/40'}`} />
+{placeEditError?.lat && <span id={`place-lat-error-${id}`} role="alert" className="mt-0.5 block text-[10.5px] font-medium text-rose-700">{placeEditError.lat}</span>}
+</label>
+<label className="min-w-0 flex-1">
+<span className="sr-only">{`Longitude for ${fallbackName}`}</span>
+<input ref={editLonRef} inputMode="decimal" value={editLonDraft} aria-invalid={placeEditError?.lon ? true : undefined} aria-describedby={placeEditError?.lon ? `place-lon-error-${id}` : undefined} onChange={event => {
+          setEditLonDraft(event.target.value);
+          if (placeEditError?.lon) setPlaceEditError(prev => prev ? {
+            ...prev,
+            lon: undefined
+          } : prev);
+        }} placeholder="lon" className={`w-full rounded-lg border bg-white/90 px-2 py-1 font-mono text-[11px] text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500 ${placeEditError?.lon ? 'border-rose-500' : 'border-slate-400/40'}`} />
+{placeEditError?.lon && <span id={`place-lon-error-${id}`} role="alert" className="mt-0.5 block text-[10.5px] font-medium text-rose-700">{placeEditError.lon}</span>}
+</label>
 <button type="button" aria-label="Pick a new location on the map" title="Pick a new location on the map" onClick={() => startPlacePick(id)} className="shrink-0 rounded-lg border border-slate-400/50 bg-white/85 px-2 py-1 hover:bg-white">              🎯            </button>
 </div>}      </form>      {/* Pindah lokasi lewat pencarian nama places */}      <form onSubmit={runPlaceSearch} className="flex gap-1.5">
 <input aria-label="Search for a new location for this place" value={placeSearchQuery} onChange={event => setPlaceSearchQuery(event.target.value)} placeholder="Search for a new location..." className="min-w-0 flex-1 rounded-lg border border-slate-400/40 bg-white/90 px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500" />
@@ -2248,8 +2552,10 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
 </form>      {placeSearchResults.length > 0 && <div className="max-h-28 space-y-1 overflow-y-auto cesium-glass-scroll">          {placeSearchResults.map((pt, idx) => (
 
       <button key={`${pt.lon}-${pt.lat}-${idx}`} type="button" onClick={() => movePlace(id, pt)} className="block w-full truncate rounded-lg bg-white/85 px-2 py-1 text-left text-[11px] text-slate-800 hover:bg-orange-500 hover:text-white transition">              📍 {pt.name}            </button>))}        </div>}      <div className="flex flex-wrap items-center gap-1.5">
-<label className="cursor-pointer rounded-lg border border-slate-400/50 bg-white/85 px-2 py-1 font-medium hover:bg-white">          Logo          <input type="file" accept="image/*" className="hidden" onChange={event => void handleLogoPick(id, event)} />
-</label>        {placeOverrides[id]?.logo ? <>            {LOGO_RATIOS.map(ratio => {
+<button type="button" onClick={() => logoInputRefs.current[id]?.click()} className="rounded-lg border border-slate-400/50 bg-white/85 px-2 py-1 font-medium hover:bg-white">          Logo        </button>
+<input ref={el => {
+          logoInputRefs.current[id] = el;
+        }} type="file" accept="image/*" tabIndex={-1} aria-hidden="true" className="hidden" onChange={event => void handleLogoPick(id, event)} />        {placeOverrides[id]?.logo ? <>            {LOGO_RATIOS.map(ratio => {
           const activeRatio = placeOverrides[id]?.ratio ?? '3:2';
           return <button key={ratio.id} type="button" aria-pressed={activeRatio === ratio.id} title={`Use logo for pin ${ratio.label}`} onClick={() => updateOverride(id, {
             ratio: ratio.id
@@ -2271,25 +2577,24 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
         event.dataTransfer.setData('text/plain', poi.id);
         event.dataTransfer.effectAllowed = 'move';
         setDragPlaceId(poi.id);
-      }} onDragEnd={() => setDragPlaceId(null)} onClick={() => {
-        if (isActive) setFreeRoam();else void selectDestination(poi);
-      }} title="Click to route; drag to Point A to use as the starting point" className={`flex items-center gap-1.5 rounded-xl px-2 py-2 cursor-pointer text-[12.5px] font-normal border transition-all duration-200 ${isActive ? 'bg-gradient-to-r from-[#ff5500] to-[#ff7700] border-[#ffa044] text-white shadow-[0_4px_22px_rgba(255,85,0,0.45)] font-medium scale-[1.02]' : 'bg-white/55 border-white/70 text-slate-800 hover:bg-white/80 hover:border-white shadow-sm'} ${isHidden ? 'opacity-50' : ''} ${dragPlaceId === poi.id ? 'opacity-40' : ''}`}>
-<button type="button" aria-label={isHidden ? `Show ${label}` : `Hide ${label}`} aria-pressed={!isHidden} title={isHidden ? 'Show on the map' : 'Hide from the map'} onClick={event => {
-          event.stopPropagation();
+      }} onDragEnd={() => setDragPlaceId(null)} title="Drag to Point A to use as the starting point" className={`flex items-center gap-1 rounded-xl px-1.5 py-1 text-[12.5px] font-normal border transition-all duration-200 ${isActive ? 'bg-gradient-to-r from-[#ff5500] to-[#ff7700] border-[#ffa044] text-white shadow-[0_4px_22px_rgba(255,85,0,0.45)] font-medium' : 'bg-white/75 border-white/70 text-slate-800 hover:bg-white/90 hover:border-white shadow-sm'} ${isHidden ? 'opacity-50' : ''} ${dragPlaceId === poi.id ? 'opacity-40' : ''}`}>
+<button type="button" aria-label={isHidden ? `Show ${label} on the map` : `Hide ${label} from the map`} aria-pressed={!isHidden} title={isHidden ? 'Show on the map' : 'Hide from the map'} onClick={() => {
           updateOverride(poi.id, {
             hidden: !isHidden
           });
-        }} className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[11px] transition ${isHidden ? 'bg-slate-900/10 text-slate-600' : isActive ? 'bg-white/25 text-white hover:bg-white/40' : 'bg-white/80 text-slate-700 hover:bg-white'}`}>            {isHidden ? <EyeIcon off /> : <EyeIcon />}          </button>
-<span className="truncate font-normal flex-1">            {override.logo ? '🖼️ ' : ''}            {label}          </span>
-<span className={`shrink-0 text-[11px] ${isActive ? 'text-white/90 font-medium' : 'text-slate-600'}`}>            {estimate}          </span>
-<button type="button" aria-label={`Edit ${label}`} title="Edit name / subtitle / location / logo" onClick={event => {
-          event.stopPropagation();
+        }} className={`place-action text-[11px] ${isActive ? 'bg-black/10 text-white hover:bg-black/20' : isHidden ? 'bg-slate-900/10 text-slate-700' : 'bg-white/80 text-slate-700 hover:bg-white'}`}>            {isHidden ? <EyeIcon off /> : <EyeIcon />}          </button>
+<button type="button" onClick={() => {
+          if (isActive) setFreeRoam();else void selectDestination(poi);
+        }} aria-pressed={isActive} aria-label={`${isActive ? 'Clear route to' : 'Create route to'} ${label}`} title={isActive ? 'Clear this route' : 'Create a route to this place'} className="flex min-w-0 flex-1 items-center gap-1.5 rounded-lg px-1 py-1.5 text-left">
+<span className="truncate font-normal flex-1">              {override.logo ? '🖼️ ' : ''}              {label}            </span>
+<span className={`shrink-0 text-[11px] ${isActive ? 'text-white font-semibold' : 'text-slate-700'}`}>              {estimate}            </span>
+</button>
+<button type="button" aria-label={`Edit ${label}`} aria-expanded={editingPlaceId === poi.id} title="Edit name / subtitle / location / logo" onClick={() => {
           openPlaceEditor(poi.id, label, defaultLabel, poi.lat, poi.lon);
-        }} className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[11px] transition ${isActive ? 'bg-white/25 text-white hover:bg-white/40' : 'bg-white/80 text-slate-700 hover:bg-white'}`}>            ✎          </button>
-<button type="button" aria-label={`Delete ${label}`} title="Delete this place" onClick={event => {
-          event.stopPropagation();
+        }} className={`place-action text-[11px] ${isActive ? 'bg-black/10 text-white hover:bg-black/20' : 'bg-white/80 text-slate-700 hover:bg-white'}`}>            ✎          </button>
+<button type="button" aria-label={`Delete ${label}`} title="Delete this place" onClick={() => {
           deletePlace(poi.id);
-        }} className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[11px] transition ${isActive ? 'bg-white/25 text-white hover:bg-rose-600' : 'bg-rose-100 text-rose-600 hover:bg-rose-600 hover:text-white'}`}>
+        }} className={`place-action text-[11px] ${isActive ? 'bg-black/10 text-white hover:bg-rose-700 hover:text-white' : 'bg-rose-100 text-rose-600 hover:bg-rose-600 hover:text-white'}`}>
 <TrashIcon />
 </button>
 </div>        {editingPlaceId === poi.id && renderPlaceEditor(poi.id, poi.name, defaultLabel, {
@@ -2316,25 +2621,27 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
 <span className="h-2.5 w-2.5 rounded-full bg-orange-500 animate-ping" />
 <span>            Free roam mode: <strong>Click anywhere on the map</strong> to select{' '}            {mapPickMode === 'hub' ? 'Starting Point (0 km)' : mapPickMode === 'dest' ? 'a new place' : `new location ${pois.find(p => p.id === placePickId)?.name ?? 'places'}`}          </span>
 <button type="button" onClick={() => setMapPickMode(null)} className="rounded-full bg-white/15 hover:bg-white/25 px-2.5 py-0.5 text-[11px] font-semibold transition">            Cancel          </button>
-</div>}      {/* Pole pins overlay */}      <div className={`pins transition-opacity duration-300 ${showTooltips ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>        {[hub, ...pois].filter(loc => !placeOverrides[loc.id]?.hidden).map(loc => {
+</div>}      {/* Pole pins overlay */}      <div inert={!showTooltips} aria-hidden={!showTooltips} className={`pins transition-opacity duration-300 ${showTooltips ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>        {[hub, ...pois].filter(loc => !placeOverrides[loc.id]?.hidden).map(loc => {
         const override = placeOverrides[loc.id] || {};
         const label = nameOf(loc.id, loc.name);
-        return <div key={loc.id} ref={el => {
+        const isActivePin = activePoi === loc.id;
+        const pinAction = loc.id === 'hub' ? activePoi !== null ? 'Clear the route and focus the starting point' : 'Focus the starting point' : isActivePin ? 'Clear this route' : 'Create a route to this place';
+        return <button type="button" key={loc.id} ref={el => {
           pinRefs.current[loc.id] = el;
-        }} className={`pole ${loc.id === 'hub' ? 'hub' : ''} ${activePoi === loc.id ? 'active' : ''}`} onClick={() => {
+        }} aria-label={`${label}. ${pinAction}`} aria-pressed={loc.id === 'hub' ? undefined : isActivePin} title={pinAction} className={`pole ${loc.id === 'hub' ? 'hub' : ''} ${isActivePin ? 'active' : ''}`} onClick={() => {
           if (loc.id === 'hub') {
             if (activePoi !== null) setFreeRoam();else resetToHub();
           } else {
-            if (activePoi === loc.id) setFreeRoam();else selectDestination(loc as Poi);
+            if (activePoi === loc.id) setFreeRoam();else void selectDestination(loc as Poi);
           }
-        }}>                {override.logo ? <div className={`pole-logo ${override.ratio === '4:3' ? 'ratio-4-3' : 'ratio-3-2'}`}>                    {/* eslint-disable-next-line @next/next/no-img-element -- Pin logos are local data URLs. */}
-<img src={override.logo} alt={label} />
-</div> : <div className="pole-label">
+        }}>                {override.logo ? <span className={`pole-logo ${override.ratio === '4:3' ? 'ratio-4-3' : 'ratio-3-2'}`}>                    {/* eslint-disable-next-line @next/next/no-img-element -- Pin logos are local data URLs. */}
+<img src={override.logo} alt="" />
+</span> : <span className="pole-label">
 <span>{label}</span>
 <span className="pole-sub">{pinSub(loc)}</span>
-</div>}                <div className="pole-line" />
-<div className="pole-dot" />
-</div>;
+</span>}                <span className="pole-line" />
+<span className="pole-dot" />
+</button>;
       })}      </div>      {recordError && <div role="alert" className="absolute bottom-5 right-4 z-40 max-w-sm rounded-xl bg-red-950/95 p-4 text-xs text-white">          {recordError}          <button type="button" className="ml-3 underline" onClick={() => setRecordError(null)}>            Close          </button>
 </div>}      {/* Floating Presentation Recording HUD */}      {isRecording && <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-full border border-red-500/50 bg-slate-950/85 px-5 py-2 shadow-2xl backdrop-blur-2xl ring-2 ring-red-500/30 text-white">
 <div className="flex items-center gap-2">
@@ -2349,38 +2656,38 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
 <span>Stop and save MP4</span>
 </button>
 </div>}      {/* Record Setup Modal */}      {showRecordModal && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-<div className="w-full max-w-sm rounded-2xl border border-white/80 bg-white/95 p-5 shadow-2xl backdrop-blur-2xl text-slate-800">
-<div className="flex items-center gap-2 mb-2 font-bold text-base text-slate-900">
-<span className="flex h-3 w-3 rounded-full bg-red-600 animate-pulse" />
+<div ref={recordDialogRef} role="dialog" aria-modal="true" aria-labelledby="record-dialog-title" aria-describedby="record-dialog-desc" tabIndex={-1} className="floating-panel record-dialog w-full max-w-sm rounded-2xl border border-white/80 bg-white/95 p-5 shadow-2xl backdrop-blur-2xl text-slate-800 focus:outline-none">
+<h2 id="record-dialog-title" className="record-title flex items-center gap-2 mb-2 font-bold text-base text-slate-900">
+<span aria-hidden="true" className="flex h-3 w-3 rounded-full bg-red-600 animate-pulse" />
 <span>Record cinematic video (MP4)</span>
-</div>
-<p className="text-xs text-slate-600 leading-relaxed mb-4">              MP4 recording stops and saves automatically after 60 seconds. You can stop earlier. Target frame rate is 60 FPS, depending on your device. Routes, pins, and map attribution are included; controls are hidden.            </p>
+</h2>
+<p id="record-dialog-desc" className="record-copy text-xs text-slate-600 leading-relaxed mb-4">              MP4 recording stops and saves automatically after 60 seconds. You can stop earlier. Target frame rate is 60 FPS, depending on your device. Routes, pins, and map attribution are included; controls are hidden.            </p>
 <div className="space-y-2.5 mb-5 text-xs font-medium text-slate-700">
-<label className="flex items-center gap-2 cursor-pointer select-none">
+<label className="record-option flex items-center gap-2 cursor-pointer select-none">
 <input type="checkbox" checked={recordWithEarthIntro} onChange={e => setRecordWithEarthIntro(e.target.checked)} className="rounded accent-[#ff5500] w-4 h-4 cursor-pointer" />
 <span>Start from space (Full Earth globe intro)</span>
 </label>
 </div>
 <div className="flex gap-2 justify-end">
-<button onClick={() => setShowRecordModal(false)} className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200/60 transition">                Cancel              </button>
-<button onClick={startRecording} className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-red-500/25 transition active:scale-95">
-<span>⏺️</span>
+<button type="button" onClick={() => setShowRecordModal(false)} className="record-cancel rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200/60 transition">                Cancel              </button>
+<button type="button" onClick={() => void startRecording()} className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-red-500/25 transition active:scale-95">
+<span aria-hidden="true">⏺️</span>
 <span>Start recording</span>
 </button>
 </div>
 </div>
 </div>}      {/* Collapsible Left Sidebar */}      <div className={`absolute top-5 left-4 bottom-5 z-20 transition-all duration-300 ease-in-out ${sidebarOpen ? 'w-[295px] translate-x-0' : 'w-[295px] -translate-x-[312px]'}`}>
-<button onClick={() => {
+<button ref={sidebarToggleRef} type="button" aria-expanded={sidebarOpen} aria-controls="showcase-sidebar" aria-label={sidebarOpen ? 'Hide side panel' : 'Show side panel'} onClick={() => {
         setSidebarOpen(!sidebarOpen);
       }} className="absolute -right-7 top-4 z-30 flex h-7 w-7 items-center justify-center rounded-r-2xl border-y border-r border-white/70 bg-white/60 text-xs font-medium text-slate-800 shadow-xl backdrop-blur-2xl transition hover:bg-white/85" title={sidebarOpen ? 'Hide panel' : 'Show panel'}>          {sidebarOpen ? '‹' : '›'}        </button>
-<aside className="navigation-panel h-full w-full flex flex-col rounded-2xl border border-white/70 bg-white/40 text-slate-800 shadow-[0_16px_40px_0_rgba(0,0,0,0.18)] backdrop-blur-2xl ring-1 ring-white/60 overflow-hidden">
+<aside id="showcase-sidebar" inert={!sidebarOpen} aria-hidden={!sidebarOpen} className="navigation-panel h-full w-full flex flex-col rounded-2xl border border-white/70 bg-white/75 text-slate-800 shadow-[0_16px_40px_0_rgba(0,0,0,0.18)] backdrop-blur-2xl ring-1 ring-white/60 overflow-hidden">
 <div className="flex-1 overflow-y-auto p-4 cesium-glass-scroll">            {settingsOpen ? <section className="settings-panel" aria-label="Surrounding area settings">
 <div className="flex items-center justify-between border-b border-slate-500/20 pb-3 text-[11px] font-medium uppercase tracking-wider">
 <span>Surrounding settings</span>
 <button type="button" aria-label="Back to Surrounding Area" onClick={() => setSettingsOpen(false)} className="rounded-lg px-2 py-1 text-base">                    ×                  </button>
 </div>
 <div className="mt-2">
-<button type="button" onClick={() => setSettingsOpen(false)} className="mb-3 text-xs font-medium text-orange-600">                    ← Back to Surrounding Area                  </button>
+<button type="button" onClick={() => setSettingsOpen(false)} className="mb-3 text-xs font-medium app-accent-text">                    ← Back to Surrounding Area                  </button>
 <div className="mb-4">
 <div className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-slate-500">                      Map skin                    </div>
 <div className="grid grid-cols-2 gap-1.5">                      {MAP_SKINS.map(skin => <button key={skin.id} type="button" aria-pressed={mapSkin === skin.id} title={skin.hint} onClick={() => {
@@ -2422,38 +2729,29 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
 <span aria-hidden="true" className={`switch-track ${setting.value ? 'on' : ''}`}>
 <span />
 </span>
-</button>)}                  <p className="mt-3 text-[11px] opacity-70">                    {showEsriLabels ? 'Informative: Esri place names and boundaries.' : 'Clean: satellite imagery without Esri labels.'}                  </p>
-<div className="mt-3 text-xs">
-<div className="mt-3 rounded-lg border border-orange-400/40 bg-white/50 px-2.5 py-2 text-[11px]">
-<div className="flex items-center justify-between gap-2">
-<span className="font-medium">Toll roads (local data)</span>                        {showTolls && !tollReady && !tollError && <span role="status" className="text-[10px] opacity-75">loading...</span>}                        {tollReady && <span className="text-[10px] opacity-75">                            {tollCount} segments · {tollLabelCount} labels                          </span>}                      </div>                      {tollError ? <p role="alert" className="mt-1 text-[10px] text-red-600">{tollError}</p> : <p className="mt-1 text-[10px] opacity-70">                          {showTolls ? 'Visible on the map. Turn off Toll roads to hide.' : 'Enable Toll roads above to show this layer.'}                        </p>}                    </div>
-<div className="mt-3 rounded-lg border border-yellow-400/40 px-2.5 py-2">
-<p className="font-medium">Railways and stations (local data)</p>
-{!showRailways && <p className="mt-1 text-[10px] opacity-70">Enable Railways and stations to load your local JSON.</p>}
-{showRailways && railwayStatus === 'loading' && <p role="status">Loading local railway data...</p>}
-{showRailways && railwayStatus === 'missing' && <p role="status">Railway JSON is not available yet. Add it at public/data/railway.geojson.</p>}
-{showRailways && railwayStatus === 'ready' && <p role="status">{railwayCount} railway segments and stations loaded.</p>}
-{showRailways && railwayStatus === 'error' && <p role="alert" className="text-red-600">{railwayError} Toggle this layer off and on to retry.</p>}
-</div></div>
-<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer" className="mt-3 block text-[10px] underline opacity-70">                    © OpenStreetMap contributors / ODbL                  </a>                  {/* Save Setting (hub, skin, nama/label/logo, daftar places) */}                  <div className="mt-3 border-t border-slate-500/20 pt-3 text-xs">
+</button>)}
+{showTolls && tollError && <p role="alert" className="mt-3 text-xs text-red-600">{tollError}</p>}
+{showRailways && railwayStatus === 'missing' && <p role="alert" className="mt-3 text-xs text-red-600">Railway data is unavailable. Turn this layer off or try again later.</p>}
+{showRailways && railwayStatus === 'error' && <p role="alert" className="mt-3 text-xs text-red-600">{railwayError} Toggle this layer off and on to retry.</p>}
+{/* Save Setting (hub, skin, nama/label/logo, daftar places) */}                  <div className="mt-3 border-t border-slate-500/20 pt-3 text-xs">
 <div className="mb-1.5 flex items-center justify-between">
 <span className="text-[10px] font-medium uppercase tracking-wider text-slate-800">                        Save Setting                      </span>
 <span className="text-[10px] opacity-70">{pois.length} places</span>
 </div>
 <div className="flex gap-1.5">
 <button type="button" onClick={downloadSetup} className="flex-1 rounded-lg border border-slate-400/50 bg-white/85 px-2 py-1.5 text-[11px] font-medium hover:bg-white">                        Export JSON                      </button>
-<label className="flex-1 cursor-pointer rounded-lg border border-slate-400/50 bg-white/85 px-2 py-1.5 text-center text-[11px] font-medium hover:bg-white">                        Import JSON                        <input type="file" accept="application/json,.json" className="hidden" onChange={event => void importSetup(event)} />
-</label>
+<button type="button" onClick={() => importInputRef.current?.click()} className="flex-1 rounded-lg border border-slate-400/50 bg-white/85 px-2 py-1.5 text-center text-[11px] font-medium hover:bg-white">                        Import JSON                      </button>
+<input ref={importInputRef} type="file" accept="application/json,.json" tabIndex={-1} aria-hidden="true" className="hidden" onChange={event => void importSetup(event)} />
 </div>
 <p className="mt-1.5 text-[10px] leading-snug opacity-70">                      Settings are saved automatically in this browser. Export JSON to transfer them to another browser or restore them after clearing browser data.                    </p>                    {setupMessage && <p role="status" className="mt-1 text-[10px] font-medium text-emerald-700">                        {setupMessage}                      </p>}                  </div>
 </div>
 </section> : <>
 <div className="flex items-center justify-between pb-3 border-b border-slate-900/10 mb-3.5">
 <h1 className="text-xs font-medium uppercase tracking-wider text-slate-800">                    {isBsdMode ? 'BSD City 3D Orbit' : 'Surrounding Area'}                  </h1>
-<button type="button" aria-label="Open layer settings" aria-expanded={settingsOpen} onClick={() => setSettingsOpen(true)} className="rounded-lg px-2 py-1 text-base" title="Layer settings">                    ⚙                  </button>
+<button type="button" aria-label="Open layer settings" aria-expanded={settingsOpen} onClick={() => setSettingsOpen(true)} className="flex h-8 w-8 items-center justify-center rounded-lg text-base" title="Layer settings">                    ⚙                  </button>
 </div>                {/* POIN 1: STARTING POINT (HUB 0 KM) — KLIK LANGSUNG BUKA 1 SEARCH OMNIBOX + FREE ROAM */}                <div className="flex items-center justify-between mt-1 mb-1.5">
 <h3 className="text-[10px] uppercase tracking-wider font-medium text-slate-800">                    Starting Point (Point A)                  </h3>
-<div className="flex items-center gap-2">                    {activePoi !== null && <span className="text-[10px] text-orange-600 font-medium">Active route</span>}                    <button type="button" onClick={resetToHub} className="text-[10px] text-slate-800 hover:text-orange-600 underline" title="Focus the camera on the starting point">                      Focus                    </button>
+<div className="flex items-center gap-2">                    {activePoi !== null && <span className="text-[10px] app-accent-text font-medium">Active route</span>}                    <button type="button" onClick={resetToHub} className="text-[10px] text-slate-800 hover:text-orange-600 underline" title="Focus the camera on the starting point">                      Focus                    </button>
 </div>
 </div>
 <div onDragOver={event => {
@@ -2463,34 +2761,31 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
               event.preventDefault();
               dropOnHub(dragPlaceId || event.dataTransfer.getData('text/plain'));
               setDragPlaceId(null);
-            }} className={`flex items-center justify-between rounded-xl px-3 py-2.5 mb-2 cursor-pointer text-[12.5px] border transition-all duration-200 ${hubEditorOpen || editingPlaceId === 'hub' ? 'bg-orange-600 text-white border-orange-500 shadow-md font-medium' : activePoi !== null ? 'bg-gradient-to-r from-[#ff5500] to-[#ff7700] border-[#ffa044] text-white shadow-[0_4px_22px_rgba(255,85,0,0.45)] font-medium' : 'bg-white/55 border-white/70 text-slate-800 hover:bg-white/80 hover:border-white shadow-sm'} ${dragPlaceId && dragPlaceId !== 'hub' ? 'ring-2 ring-orange-400 ring-offset-1' : ''} ${hubOverride.hidden ? 'opacity-50' : ''}`} onClick={() => {
-              setHubEditorOpen(prev => !prev);
-              setDestSearchOpen(false);
-              setEditingPlaceId(null);
-            }} title="Click to change the starting point; drop a place here to use it as the starting point">
-<button type="button" aria-label={hubOverride.hidden ? 'Show starting point' : 'Hide starting point'} aria-pressed={!hubOverride.hidden} title={hubOverride.hidden ? 'Show on the map' : 'Hide from the map'} onClick={event => {
-                event.stopPropagation();
+            }} className={`flex items-center gap-1 rounded-xl px-1.5 py-1 mb-2 text-[12.5px] border transition-all duration-200 ${hubEditorOpen || editingPlaceId === 'hub' ? 'bg-[#ff5500] text-white border-[#ffa044] shadow-md font-medium' : activePoi !== null ? 'bg-gradient-to-r from-[#ff5500] to-[#ff7700] border-[#ffa044] text-white shadow-[0_4px_22px_rgba(255,85,0,0.45)] font-medium' : 'bg-white/75 border-white/70 text-slate-800 hover:bg-white/90 hover:border-white shadow-sm'} ${dragPlaceId && dragPlaceId !== 'hub' ? 'ring-2 ring-orange-400 ring-offset-1' : ''} ${hubOverride.hidden ? 'opacity-50' : ''}`}>
+<button type="button" aria-label={hubOverride.hidden ? 'Show starting point' : 'Hide starting point'} aria-pressed={!hubOverride.hidden} title={hubOverride.hidden ? 'Show on the map' : 'Hide from the map'} onClick={() => {
                 updateOverride('hub', {
                   hidden: !hubOverride.hidden
                 });
-              }} className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[11px] transition ${hubEditorOpen || activePoi !== null ? 'bg-white/20 text-white hover:bg-white/35' : 'bg-white/80 text-slate-700 hover:bg-white'}`}>                    {hubOverride.hidden ? <EyeIcon off /> : <EyeIcon />}                  </button>
-<div className="flex items-center gap-1.5 truncate flex-1">
-<span>{hubOverride.logo ? '🖼️' : '📍'}</span>
+              }} className={`place-action text-[11px] ${hubEditorOpen || editingPlaceId === 'hub' || activePoi !== null ? 'bg-black/10 text-white hover:bg-black/20' : 'bg-white/80 text-slate-700 hover:bg-white'}`}>                    {hubOverride.hidden ? <EyeIcon off /> : <EyeIcon />}                  </button>
+<button type="button" aria-expanded={hubEditorOpen} aria-controls="starting-point-editor" aria-label={`Starting point: ${hubLabel}. ${hubEditorOpen ? 'Close the starting point search' : 'Change the starting point'}`} onClick={() => {
+                setHubEditorOpen(prev => !prev);
+                setDestSearchOpen(false);
+                setEditingPlaceId(null);
+              }} title="Change the starting point; drop a place here to use it as the starting point" className="flex min-w-0 flex-1 items-center gap-1.5 rounded-lg px-1 py-1.5 text-left">
+<span aria-hidden="true">{hubOverride.logo ? '🖼️' : '📍'}</span>
 <span className="truncate">{hubLabel}</span>
-</div>
+</button>
 <div className="flex items-center gap-1 shrink-0">
-<span className={`text-[10px] px-1.5 py-0.5 rounded ${hubEditorOpen || activePoi !== null ? 'bg-white/20 text-white' : 'bg-slate-900/10 text-slate-700'}`}>                      0 km                    </span>
-<button type="button" aria-label="Edit starting point" title="Edit name / subtitle / location / logo" onClick={event => {
-                  event.stopPropagation();
+<span className={`text-[10px] px-1.5 py-0.5 rounded ${hubEditorOpen || editingPlaceId === 'hub' || activePoi !== null ? 'bg-black/15 text-white' : 'bg-slate-900/10 text-slate-700'}`}>                      0 km                    </span>
+<button type="button" aria-label="Edit starting point" aria-expanded={editingPlaceId === 'hub'} title="Edit name / subtitle / location / logo" onClick={() => {
                   openPlaceEditor('hub', hubLabel, 'Starting Point (0 km)', hub.lat, hub.lon);
-                }} className={`flex h-5 w-5 items-center justify-center rounded-md text-[11px] transition ${hubEditorOpen || activePoi !== null ? 'bg-white/20 text-white hover:bg-white/35' : 'bg-white/80 text-slate-700 hover:bg-white'}`}>                      ✎                    </button>                    {activePoi !== null && <button type="button" title="Enter free roam (clear route)" aria-label="Free roam / cancel route" onClick={e => {
-                  e.stopPropagation();
+                }} className={`place-action text-[11px] ${hubEditorOpen || editingPlaceId === 'hub' || activePoi !== null ? 'bg-black/10 text-white hover:bg-black/20' : 'bg-white/80 text-slate-700 hover:bg-white'}`}>                      ✎                    </button>                    {activePoi !== null && <button type="button" title="Enter free roam (clear route)" aria-label="Free roam / cancel route" onClick={() => {
                   setFreeRoam();
-                }} className="flex h-5 w-5 items-center justify-center rounded-md bg-red-500/20 hover:bg-red-500 text-red-600 hover:text-white transition text-xs font-semibold">                        ✕                      </button>}                  </div>
+                }} className="place-action bg-black/10 text-white hover:bg-rose-700 hover:text-white transition text-xs font-semibold">                        ✕                      </button>}                  </div>
 </div>                {editingPlaceId === 'hub' && renderPlaceEditor('hub', hub.name, 'Starting Point (0 km)', {
               lat: hub.lat,
               lon: hub.lon
-            })}                {/* Drawer 1-Input Omnibox untuk Hub (0 km) */}                {hubEditorOpen && <div className="mb-3 space-y-2 rounded-xl border border-white/60 bg-white/55 p-2.5 text-xs text-slate-800 shadow-inner">
+            })}                {/* Drawer 1-Input Omnibox untuk Hub (0 km) */}                {hubEditorOpen && <div id="starting-point-editor" className="mb-3 space-y-2 rounded-xl border border-white/60 bg-white/70 p-2.5 text-xs text-slate-800 shadow-inner">
 <form onSubmit={handleHubOmniboxSubmit} className="flex gap-1.5">
 <input aria-label="Search for a starting point or paste coordinates" value={hubQuery} onChange={e => setHubQuery(e.target.value)} placeholder="Search places / paste lat, lon..." className="min-w-0 flex-1 rounded-lg border border-slate-400/40 bg-white/80 px-2.5 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500" />
 <button type="submit" disabled={hubSearchBusy || !hubQuery.trim()} className="rounded-lg bg-slate-900 hover:bg-slate-800 px-3 py-1.5 text-xs font-medium text-white disabled:opacity-40 transition">                        {hubSearchBusy ? '...' : 'Set'}                      </button>
@@ -2507,7 +2802,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
 <button type="button" aria-label={destSearchOpen ? 'Close place search' : 'Add place'} aria-expanded={destSearchOpen} title={destSearchOpen ? 'Close place search' : 'Add place'} onClick={() => {
                 setDestSearchOpen(prev => !prev);
                 setHubEditorOpen(false);
-              }} className={`flex h-5 w-5 items-center justify-center rounded-md text-sm font-semibold transition ${destSearchOpen ? 'bg-orange-600 text-white' : 'bg-orange-100 text-orange-600 hover:bg-orange-600 hover:text-white'}`}>                    {destSearchOpen ? '×' : '+'}                  </button>
+              }} className={`place-action text-sm font-semibold ${destSearchOpen ? 'bg-[#c2410c] text-white' : 'bg-orange-100 text-[#9a3412] hover:bg-[#c2410c] hover:text-white'}`}>                    {destSearchOpen ? '×' : '+'}                  </button>
 </div>                {destSearchOpen && <div className="mb-3 space-y-2 rounded-xl border border-orange-400/50 bg-white/60 p-2.5 text-xs text-slate-800 shadow-inner">
 <form onSubmit={handleDestOmniboxSubmit} className="flex gap-1.5">
 <input aria-label="Search for a place or paste coordinates" value={destQuery} onChange={e => setDestQuery(e.target.value)} placeholder="Search places / paste lat, lon..." className="min-w-0 flex-1 rounded-lg border border-slate-400/40 bg-white/85 px-2.5 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500" />
@@ -2524,7 +2819,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
                   lon: pt.lon
                 })} className="block w-full rounded-lg bg-white/80 hover:bg-orange-500 hover:text-white px-2.5 py-1.5 text-left text-[11px] text-slate-800 transition truncate">                            🏁 {pt.name}                          </button>)}                      </div>}                    {destMessage && <p className="text-[10.5px] text-slate-600 leading-snug">{destMessage}</p>}                  </div>}                {/* Pinned locations */}                <h3 className="mt-2.5 mb-1.5 text-[10px] uppercase tracking-wider font-medium text-slate-800">                  Pinned Location                </h3>
 <div className="space-y-1.5">                  {pois.map(renderPlaceRow)}                </div>
-</>}          </div>          {/* Bottom Toolbar: 5 Tool Icons */}          <div className="relative border-t border-slate-900/10 bg-white/50 p-2 backdrop-blur-md">            {/* 5 Icons Grid */}            <div className="grid grid-cols-5 gap-1.5">              {/* 1. Mata Coret: Hide/Show Tooltip */}              <button onClick={() => setShowTooltips(!showTooltips)} className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all active:scale-95 ${!showTooltips ? 'bg-rose-50 border-rose-300 text-rose-600 shadow-sm' : 'bg-white/60 border-white/80 text-slate-700 hover:bg-white hover:text-black shadow-sm'}`} title={showTooltips ? 'Hide pins and tooltips' : 'Show pins and tooltips'}>                {!showTooltips ? <svg className="w-4 h-4 text-rose-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+</>}          </div>          {/* Bottom Toolbar: 5 Tool Icons */}          <div className="relative border-t border-slate-900/10 bg-white/50 p-2 backdrop-blur-md">            {/* 5 Icons Grid */}            <div className="grid grid-cols-5 gap-1.5">              {/* 1. Mata Coret: Hide/Show Tooltip */}              <button type="button" onClick={() => setShowTooltips(!showTooltips)} aria-label={showTooltips ? 'Hide pins and tooltips' : 'Show pins and tooltips'} aria-pressed={showTooltips} className={`flex min-h-11 flex-col items-center justify-center p-2 rounded-xl border transition-all active:scale-95 ${!showTooltips ? 'bg-rose-50 border-rose-300 text-rose-600 shadow-sm' : 'bg-white/60 border-white/80 text-slate-700 hover:bg-white hover:text-black shadow-sm'}`} title={showTooltips ? 'Hide pins and tooltips' : 'Show pins and tooltips'}>                {!showTooltips ? <svg className="w-4 h-4 text-rose-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
 <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
 <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
@@ -2534,6 +2829,9 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
 <circle cx="12" cy="12" r="3" />
 </svg>}              </button>              {/* 2. Auto Rotate (with smooth Ease-In-Out Zoom Out pull-back) */}
               <button
+                type="button"
+                aria-label={autoRotate ? 'Pause auto-rotate' : 'Start auto-rotate'}
+                aria-pressed={autoRotate}
                 onClick={() => {
                   if (autoRotate && !showRotateSlider) {
                     setShowRotateSlider(true);
@@ -2546,17 +2844,11 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
                     }
                     setShowRotateSlider(true);
                   } else {
-                    autoRotateRef.current = false;
-                    setAutoRotate(false);
+                    stopAutoRotate();
                     setShowRotateSlider(false);
-                    orbitRangeRef.current = null;
-                    orbitPitchRef.current = null;
-                    orbitTargetRef.current = null;
-                    orbitAnimTargetRangeRef.current = null;
-                    freeRoamSphereRef.current = null;
                   }
                 }}
-                className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all active:scale-95 ${autoRotate ? 'bg-[#ff5500]/15 border-[#ff5500]/50 text-[#ff5500] shadow-sm' : 'bg-white/60 border-white/80 text-slate-700 hover:bg-white hover:text-black shadow-sm'}`}
+                className={`flex min-h-11 flex-col items-center justify-center p-2 rounded-xl border transition-all active:scale-95 ${autoRotate ? 'bg-[#ff5500]/15 border-[#ff5500]/50 text-[#ff5500] shadow-sm' : 'bg-white/60 border-white/80 text-slate-700 hover:bg-white hover:text-black shadow-sm'}`}
                 title="Auto-rotate camera (360-degree orbit)"
               >
                 <svg
@@ -2571,7 +2863,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
                 >
                   <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
                 </svg>
-              </button>              {/* 3. Bird Eye (Icon Burung) */}              <button onClick={flyToMacroOverview} className="flex flex-col items-center justify-center p-2 rounded-xl border border-white/80 bg-white/60 text-slate-700 hover:bg-white hover:text-black shadow-sm transition-all active:scale-95" title="Bird’s-eye overview">
+              </button>              {/* 3. Bird Eye (Icon Burung) */}              <button type="button" aria-label="Bird's-eye overview" onClick={flyToMacroOverview} className="flex min-h-11 flex-col items-center justify-center p-2 rounded-xl border border-white/80 bg-white/60 text-slate-700 hover:bg-white hover:text-black shadow-sm transition-all active:scale-95" title="Bird’s-eye overview">
 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 <path d="M16 7h.01" />
 <path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 18Z" />
@@ -2580,15 +2872,15 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
 <path d="M14 17.75V21" />
 <path d="M7 18a6 6 0 0 0 3.84-10.61" />
 </svg>
-</button>              {/* 4. Zoom Earth (Icon Bumi) */}              <button onClick={replayIntro} className="flex flex-col items-center justify-center p-2 rounded-xl border border-white/80 bg-white/60 text-slate-700 hover:bg-white hover:text-black shadow-sm transition-all active:scale-95" title="Zoom to Earth from space">
+</button>              {/* 4. Zoom Earth (Icon Bumi) */}              <button type="button" aria-label="Zoom to Earth from space" onClick={replayIntro} className="flex min-h-11 flex-col items-center justify-center p-2 rounded-xl border border-white/80 bg-white/60 text-slate-700 hover:bg-white hover:text-black shadow-sm transition-all active:scale-95" title="Zoom to Earth from space">
 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 <circle cx="12" cy="12" r="10" />
 <line x1="2" y1="12" x2="22" y2="12" />
 <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
 </svg>
-</button>              {/* 5. Record MP4 */}              <button onClick={() => {
+</button>              {/* 5. Record MP4 */}              <button type="button" ref={recordTriggerRef} aria-label={isRecording ? 'Stop recording and save MP4' : 'Record MP4 video'} aria-pressed={isRecording} onClick={() => {
               if (isRecording) stopRecording();else setShowRecordModal(true);
-            }} className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all active:scale-95 ${isRecording ? 'bg-red-50 border-red-400 text-red-600 shadow-sm animate-pulse' : 'bg-white/60 border-white/80 text-slate-700 hover:bg-white hover:text-black shadow-sm'}`} title="Record MP4 video (presentation mode)">                {isRecording ? <span className="relative flex h-3.5 w-3.5 items-center justify-center">
+            }} className={`flex min-h-11 flex-col items-center justify-center p-2 rounded-xl border transition-all active:scale-95 ${isRecording ? 'bg-red-50 border-red-400 text-red-600 shadow-sm animate-pulse' : 'bg-white/60 border-white/80 text-slate-700 hover:bg-white hover:text-black shadow-sm'}`} title="Record MP4 video (presentation mode)">                {isRecording ? <span className="relative flex h-3.5 w-3.5 items-center justify-center">
 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
 <span className="relative inline-flex rounded-sm h-3 w-3 bg-red-600"></span>
 </span> : <svg className="w-4 h-4 text-red-500 fill-red-500" viewBox="0 0 24 24">
@@ -2614,7 +2906,9 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
           style={
             rotatePanelPos ? { left: `${rotatePanelPos.x}px`, top: `${rotatePanelPos.y}px`, right: 'auto', bottom: 'auto' } : undefined
           }
-          className="fixed bottom-6 left-3 min-[1000px]:left-[332px] z-40 w-80 max-w-[calc(100vw-3rem)] rounded-2xl border border-white/80 bg-white/95 p-3.5 shadow-2xl backdrop-blur-2xl text-slate-800 animate-in fade-in slide-in-from-bottom-2 duration-200 select-none ring-1 ring-black/5"
+          className="orbit-panel floating-panel fixed bottom-6 left-3 min-[1000px]:left-[332px] z-40 w-80 max-w-[calc(100vw-3rem)] rounded-2xl border border-white/80 bg-white/95 p-3.5 shadow-2xl backdrop-blur-2xl text-slate-800 animate-in fade-in slide-in-from-bottom-2 duration-200 select-none ring-1 ring-black/5"
+          role="region"
+          aria-label="Orbit controls"
         >
           {/* Drag Handle & Header */}
           <div
@@ -2622,38 +2916,68 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
             onPointerMove={handlePanelDragMove}
             onPointerUp={handlePanelDragEnd}
             onPointerCancel={handlePanelDragEnd}
-            className="flex items-center justify-between pb-2 mb-2 border-b border-slate-200/80 cursor-grab active:cursor-grabbing touch-none select-none"
-            title="Drag to reposition panel"
+            onDoubleClick={resetPanelPosition}
+            className="orbit-divider flex items-center justify-between pb-2 mb-2 border-b border-slate-200/80 cursor-grab active:cursor-grabbing touch-none select-none"
+            title="Drag to reposition. Double-click to reset the position."
           >
             <div className="flex items-center gap-1.5">
-              <span className="text-slate-400 font-mono text-sm leading-none" aria-hidden="true">⠿</span>
-              <span className="font-semibold text-xs text-slate-800">
+              <span className="orbit-muted text-slate-500 font-mono text-sm leading-none" aria-hidden="true">⠿</span>
+              <span className="orbit-heading font-semibold text-xs text-slate-800">
                 {isBsdMode ? 'BSD City Orbit' : 'Auto-Rotate Orbit'}
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[#ff5500] font-mono font-bold text-xs bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200">
+            <div className="flex items-center gap-1.5">
+              <span className="orbit-speed-chip text-[#c2410c] font-mono font-bold text-xs bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200">
                 {rotateSpeed.toFixed(1)}x
               </span>
+              {rotatePanelPos && <button type="button" onClick={resetPanelPosition} aria-label="Reset panel position" title="Reset panel position" className="orbit-secondary flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 transition">⌂</button>}
               <button
                 type="button"
                 onClick={() => setShowRotateSlider(false)}
-                className="text-slate-400 hover:text-slate-700 text-xs px-1.5 py-0.5 rounded hover:bg-slate-100 transition"
-                title="Hide controls"
+                aria-label="Hide orbit controls (the orbit keeps running)"
+                className="orbit-secondary flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 transition"
+                title="Hide these controls; the orbit keeps running"
               >
                 ✕
               </button>
             </div>
           </div>
 
+          {/* Pause / Resume — distinct from hiding the panel */}
+          <div className="mb-2.5 flex items-center gap-2">
+            <button
+              type="button"
+              aria-pressed={autoRotate}
+              onClick={() => {
+                if (autoRotate) {
+                  stopAutoRotate();
+                } else if (viewerRef.current?.__startCinematicOrbit) {
+                  viewerRef.current.__startCinematicOrbit();
+                } else {
+                  autoRotateRef.current = true;
+                  setAutoRotate(true);
+                }
+              }}
+              className="orbit-secondary flex-1 rounded-lg border border-slate-300/80 bg-white px-2 py-1.5 text-[11px] font-semibold text-slate-800 hover:bg-slate-100 transition"
+            >
+              {autoRotate ? 'Pause orbit' : 'Resume orbit'}
+            </button>
+            <span role="status" className="orbit-muted text-[11px] font-medium text-slate-600">
+              {autoRotate ? 'Orbiting' : 'Paused'}
+            </span>
+          </div>
+
           {/* Speed slider */}
           <div className="mb-2.5">
+            <label htmlFor="orbit-speed" className="orbit-accent mb-1 block text-[10.5px] font-medium">Orbit speed ({rotateSpeed.toFixed(1)}x)</label>
             <input
+              id="orbit-speed"
               type="range"
               min="0.2"
               max="3.0"
               step="0.1"
               value={rotateSpeed}
+              aria-valuetext={`${rotateSpeed.toFixed(1)} times speed`}
               onChange={e => {
                 const val = parseFloat(e.target.value);
                 setRotateSpeed(val);
@@ -2661,9 +2985,9 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
                   localStorage.setItem(ROTATE_SPEED_KEY, String(val));
                 } catch {}
               }}
-              className="w-full accent-[#ff5500] h-1.5 bg-slate-200 rounded-lg cursor-pointer"
+              className="orbit-slider w-full cursor-pointer"
             />
-            <div className="flex justify-between text-[9px] text-slate-400 mt-1 font-semibold">
+            <div className="orbit-accent flex justify-between text-[10.5px] mt-1 font-medium">
               <span>Slow (0.2x)</span>
               <span>Normal (1.0x)</span>
               <span>Fast (3.0x)</span>
@@ -2671,7 +2995,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
           </div>
 
           {/* Tombol Smooth Ease-In-Out Zoom Saat Orbit */}
-          <div className="pt-2 border-t border-slate-200/80">
+          <div className="orbit-divider pt-2 border-t border-slate-200/80">
             <div className="flex items-center justify-between gap-1.5 mb-2">
               <button
                 type="button"
@@ -2679,7 +3003,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
                   const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? (isBsdMode ? 26000 : 2000);
                   triggerSmoothOrbitZoom(cur * 0.7, 950);
                 }}
-                className="flex-1 rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white py-1 text-[10.5px] font-medium text-slate-700 transition active:scale-95 text-center shadow-sm"
+                className="orbit-secondary flex-1 rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white py-1.5 text-[11px] font-medium text-slate-700 transition active:scale-95 text-center shadow-sm"
                 title="Smooth zoom in"
               >
                 🔍+ In
@@ -2690,7 +3014,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
                   const cur = orbitAnimTargetRangeRef.current ?? orbitRangeRef.current ?? (isBsdMode ? 26000 : 2000);
                   triggerSmoothOrbitZoom(cur * 1.45, 1100);
                 }}
-                className="flex-1 rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white py-1 text-[10.5px] font-medium text-slate-700 transition active:scale-95 text-center shadow-sm"
+                className="orbit-secondary flex-1 rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white py-1.5 text-[11px] font-medium text-slate-700 transition active:scale-95 text-center shadow-sm"
                 title="Smooth zoom out"
               >
                 🔍− Out
@@ -2698,7 +3022,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
               <button
                 type="button"
                 onClick={() => triggerSmoothOrbitZoom(isBsdMode ? 35000 : 9500, 1600)}
-                className="rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white px-2.5 py-1 text-[10.5px] font-medium text-slate-700 transition active:scale-95 shadow-sm"
+                className="orbit-secondary rounded-lg bg-slate-100 hover:bg-orange-500 hover:text-white px-2.5 py-1.5 text-[11px] font-medium text-slate-700 transition active:scale-95 shadow-sm"
                 title="Zoom out to view the surrounding area"
               >
                 Wide
@@ -2706,7 +3030,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
             </div>
 
             {/* Auto-rotate after intro finishes */}
-            <label className="flex items-center gap-2 cursor-pointer text-[10.5px] text-slate-600 hover:text-slate-900 transition pt-1.5 border-t border-slate-200/60">
+            <label className="orbit-divider orbit-muted flex items-center gap-2 cursor-pointer text-[11px] text-slate-600 hover:text-slate-900 transition pt-1.5 border-t border-slate-200/60">
               <input
                 type="checkbox"
                 checked={autoRotateOnArrival}
@@ -2716,7 +3040,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
                   setAutoRotateOnArrival(checked);
                   persistPreferences(hub, checked);
                 }}
-                className="accent-orange-600 rounded cursor-pointer"
+                className="accent-[#ff5500] rounded cursor-pointer"
               />
               <span>Auto-rotate after intro finishes</span>
             </label>
