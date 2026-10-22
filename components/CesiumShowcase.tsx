@@ -11,6 +11,7 @@ import { buildTollLabels, loadTollGeoJson } from "@/lib/localToll";
 import { POIS_KEY, buildSetupBundle, readPois, readSetupBundle, type StoredPoi } from "@/lib/placesStore";
 import { DEFAULT_MAP_SKIN, DEFAULT_START_POINT, MAP_SKINS, PREFERENCES_KEY, parseStartPoint, readPreferences, type MapSkin, type StartPoint } from "@/lib/cesiumPreferences";
 import { LOGO_RATIOS, PLACES_KEY, mergeOverride, placeName, readPlaceOverrides, removeOverride, type PlaceOverride, type PlaceOverrides } from "@/lib/placeOverrides";
+import { saveLogoToDb, deleteLogoFromDb, getAllLogosFromDb, migrateLogosFromLocalStorage } from "@/lib/logoDb";
 const CESIUM_VERSION = "1.126";
 const CESIUM_JS = `https://cesium.com/downloads/cesiumjs/releases/${CESIUM_VERSION}/Build/Cesium/Cesium.js`;
 const CESIUM_CSS = `https://cesium.com/downloads/cesiumjs/releases/${CESIUM_VERSION}/Build/Cesium/Widgets/widgets.css`;
@@ -839,7 +840,32 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
         /* tidak bentrok dengan HTML hasil SSR. */
         const savedOverrides = readPlaceOverrides(localStorage.getItem(PLACES_KEY));
         placeOverridesRef.current = savedOverrides;
-        setPlaceOverrides(savedOverrides); /* Daftar places (destinasi hasil search, rename, dsb) ikut dipulihkan. */
+        setPlaceOverrides(savedOverrides);
+
+        // Ambil logo dari Dexie (IndexedDB) dan migrasikan logo lama di localStorage
+        void (async () => {
+          try {
+            const migrated = await migrateLogosFromLocalStorage(PLACES_KEY);
+            const dbLogos = await getAllLogosFromDb();
+            const merged = { ...migrated, ...dbLogos };
+            if (Object.keys(merged).length > 0) {
+              setPlaceOverrides(prev => {
+                const next = { ...prev };
+                for (const [id, item] of Object.entries(merged)) {
+                  if (next[id]) {
+                    next[id] = { ...next[id], logo: item.dataUrl, ratio: item.ratio ?? next[id].ratio ?? '3:2' };
+                  } else {
+                    next[id] = { logo: item.dataUrl, ratio: item.ratio ?? '3:2' };
+                  }
+                }
+                placeOverridesRef.current = next;
+                return next;
+              });
+            }
+          } catch (err) {
+            console.warn('Failed to load logos from Dexie:', err);
+          }
+        })(); /* Daftar places (destinasi hasil search, rename, dsb) ikut dipulihkan. */
         /* `null` = belum pernah disimpan; `[]` = user memang menghapus semua pin. */
         const savedPoisRaw = localStorage.getItem(POIS_KEY);
         if (savedPoisRaw !== null) setPois(readPois(savedPoisRaw));
@@ -2307,7 +2333,13 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
   const mutateOverrides = (mutator: (prev: PlaceOverrides) => PlaceOverrides) => {
     const next = mutator(placeOverrides);
     try {
-      localStorage.setItem(PLACES_KEY, JSON.stringify(next));
+      // Simpan metadata ke localStorage tanpa data URL logo agar kuota 5MB aman (logo disimpan di Dexie)
+      const light: PlaceOverrides = {};
+      for (const [id, entry] of Object.entries(next)) {
+        const { logo: _stripped, ...rest } = entry;
+        if (Object.keys(rest).length > 0) light[id] = rest;
+      }
+      localStorage.setItem(PLACES_KEY, JSON.stringify(light));
     } catch {/* quota penuh: override tetap berlaku untuk sesi ini */}
     setPlaceOverrides(next);
   };
@@ -2409,6 +2441,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
   const deletePlace = (id: string) => {
     if (activePoi === id) setFreeRoam();
     setPois(prev => prev.filter(item => item.id !== id));
+    void deleteLogoFromDb(id);
     mutateOverrides(prev => removeOverride(prev, id));
     if (editingPlaceId === id) setEditingPlaceId(null);
   };
@@ -2417,10 +2450,14 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
     event.target.value = '';
     if (!file || !file.type.startsWith('image/')) return;
     const logo = await fileToLogoDataUrl(file);
-    if (logo) updateOverride(id, {
-      logo,
-      ratio: placeOverrides[id]?.ratio ?? '3:2'
-    });
+    if (logo) {
+      const ratio = placeOverrides[id]?.ratio ?? '3:2';
+      await saveLogoToDb(id, logo, ratio);
+      updateOverride(id, {
+        logo,
+        ratio
+      });
+    }
   }; /** Save seluruh setup (hub, skin, nama/label/logo, daftar places) jadi file JSON. */
   const downloadSetup = () => {
     try {
@@ -2475,13 +2512,29 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
       setEditingPlaceId(null);
       setPlaceSearchResults([]);
       setSetupMessage(`Loaded: ${bundle.pois.length} places.`);
+
+      // Simpan logo yang ada di bundle import ke Dexie (IndexedDB)
+      if (bundle.places) {
+        for (const [id, entry] of Object.entries(bundle.places)) {
+          if (entry.logo) {
+            void saveLogoToDb(id, entry.logo, entry.ratio);
+          }
+        }
+      }
+
       try {
         localStorage.setItem(PREFERENCES_KEY, JSON.stringify({
           hub: preferences.hub,
           autoRotateOnArrival: preferences.autoRotateOnArrival,
           skin: preferences.skin
         }));
-        localStorage.setItem(PLACES_KEY, JSON.stringify(overrides));
+        // Simpan tanpa data URL logo ke localStorage agar kuota 5MB aman
+        const light: PlaceOverrides = {};
+        for (const [id, entry] of Object.entries(overrides)) {
+          const { logo: _stripped, ...rest } = entry;
+          if (Object.keys(rest).length > 0) light[id] = rest;
+        }
+        localStorage.setItem(PLACES_KEY, JSON.stringify(light));
         localStorage.setItem(POIS_KEY, JSON.stringify(bundle.pois));
       } catch {/* localStorage penuh */}
     } catch {
@@ -2557,12 +2610,21 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
           logoInputRefs.current[id] = el;
         }} type="file" accept="image/*" tabIndex={-1} aria-hidden="true" className="hidden" onChange={event => void handleLogoPick(id, event)} />        {placeOverrides[id]?.logo ? <>            {LOGO_RATIOS.map(ratio => {
           const activeRatio = placeOverrides[id]?.ratio ?? '3:2';
-          return <button key={ratio.id} type="button" aria-pressed={activeRatio === ratio.id} title={`Use logo for pin ${ratio.label}`} onClick={() => updateOverride(id, {
-            ratio: ratio.id
-          })} className={`rounded-lg border px-2 py-1 transition ${activeRatio === ratio.id ? 'border-orange-500 bg-orange-600 text-white' : 'border-slate-400/50 bg-white/85 text-slate-700 hover:bg-white'}`}>                  {ratio.label}                </button>;
-        })}            <button type="button" onClick={() => updateOverride(id, {
-          logo: undefined
-        })} className="ml-auto rounded-lg px-1 py-1 text-rose-600 underline">              Remove logo            </button>
+          return <button key={ratio.id} type="button" aria-pressed={activeRatio === ratio.id} title={`Use logo for pin ${ratio.label}`} onClick={() => {
+            updateOverride(id, {
+              ratio: ratio.id
+            });
+            const existingLogo = placeOverrides[id]?.logo;
+            if (existingLogo) {
+              void saveLogoToDb(id, existingLogo, ratio.id);
+            }
+          }} className={`rounded-lg border px-2 py-1 transition ${activeRatio === ratio.id ? 'border-orange-500 bg-orange-600 text-white' : 'border-slate-400/50 bg-white/85 text-slate-700 hover:bg-white'}`}>                  {ratio.label}                </button>;
+        })}            <button type="button" onClick={() => {
+          void deleteLogoFromDb(id);
+          updateOverride(id, {
+            logo: undefined
+          });
+        }} className="ml-auto rounded-lg px-1 py-1 text-rose-600 underline">              Remove logo            </button>
 </> : <span className="text-[10.5px] text-slate-700">Tanpa logo = pin teks biasa</span>}      </div>
 </div>;
   const renderPlaceRow = (poi: Poi) => {
