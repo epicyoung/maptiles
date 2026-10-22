@@ -285,7 +285,7 @@ async function searchPlacesOmnibox(query: string, biasLat: number, biasLon: numb
   }
   return results;
 }
-const CSS = `@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap');.cesium-showcase, .cesium-showcase * {  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;}.cesium-showcase {  font-weight: 400;  position: relative;  width: 100%;  height: 100vh;  overflow: hidden;  background: #040814;}.cesium-showcase h1 {  font-weight: 500 !important;}.cesium-showcase .map {  position: absolute;  inset: 0;}.cesium-showcase.pick-cursor .map,.cesium-showcase.pick-cursor .map canvas {  cursor: crosshair !important;}.cesium-showcase .pins {  position: absolute;  inset: 0;  pointer-events: none;  z-index: 10;  overflow: hidden;}.cesium-showcase .pole {  position: absolute;  transform: translate(-50%, -100%);  display: flex;  flex-direction: column;  align-items: center;  pointer-events: auto;  cursor: pointer;  transition: transform .25s cubic-bezier(0.16, 1, 0.3, 1), opacity .25s ease;}.cesium-showcase .pole:hover {  transform: translate(-50%, -100%) scale(1.08);  z-index: 20;}.cesium-showcase .pole.hub { z-index: 100; }.cesium-showcase .pole.active { z-index: 110; }.cesium-showcase .pole.hub:hover, .cesium-showcase .pole.active:hover { z-index: 120; }.cesium-showcase .settings-panel {  position: relative; width: 100%; margin-top: 0;  border: 1px solid rgba(255,255,255,.7); border-radius: 16px;  background: rgba(255,255,255,.72); color: #1e293b; backdrop-filter: blur(24px);  padding: 12px;}.cesium-showcase .settings-panel.collapsed { padding: 12px; }.cesium-showcase .layer-switch {  display: flex; align-items: center; justify-content: space-between; gap: 12px;  width: 100%; padding: 12px 0; text-align: left; font-size: 12px;  border-bottom: 1px solid rgba(100,116,139,.15); cursor: pointer;}.cesium-showcase .layer-switch:focus-visible { outline: 2px solid #ff7700; outline-offset: 4px; }.cesium-showcase .switch-track { width: 30px; height: 18px; border-radius: 20px; background: #94a3b8; padding: 3px; flex-shrink: 0; }.cesium-showcase .switch-track.on { background: #ea580c; }.cesium-showcase .switch-track span { display: block; width: 12px; height: 12px; border-radius: 50%; background: white; transition: transform .2s; }.cesium-showcase .switch-track.on span { transform: translateX(12px); }.cesium-showcase.theme-dark .settings-panel,.cesium-showcase.theme-dark .navigation-panel {  background: rgba(15,23,42,.82); color: #f1f5f9; border-color: rgba(255,255,255,.18);}.cesium-showcase.theme-dark .navigation-panel [class*="text-slate-800"],.cesium-showcase.theme-dark .navigation-panel [class*="text-slate-700"] { color: #e2e8f0; }.cesium-showcase.theme-dark .navigation-panel [class*="text-slate-500"] { color: #cbd5e1; }.cesium-showcase.theme-dark .navigation-panel [class*="bg-white/"] { background-color: rgba(15,23,42,.72); border-color: rgba(255,255,255,.2); }@media (max-width: 700px) {  .cesium-showcase .settings-panel { margin-top: 0; }}/* Logo pin: pengganti label teks, rasio 3:2 atau 4:3 */.cesium-showcase .pole-logo {  background: rgba(255, 255, 255, 0.82);  backdrop-filter: blur(20px);  -webkit-backdrop-filter: blur(20px);  border: 1px solid rgba(255, 255, 255, 0.95);  border-radius: 8px;  padding: 4px;  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.22), inset 0 1px 0 0 rgba(255, 255, 255, 0.95);  transition: all .25s cubic-bezier(0.16, 1, 0.3, 1);  overflow: hidden;}.cesium-showcase .pole-logo.ratio-3-2 { width: 96px; aspect-ratio: 3 / 2; }.cesium-showcase .pole-logo.ratio-4-3 { width: 88px; aspect-ratio: 4 / 3; }.cesium-showcase .pole-logo img {  display: block;  width: 100%;  height: 100%;  object-fit: contain;  border-radius: 5px;}.cesium-showcase .pole.hub .pole-logo { width: 108px; }.cesium-showcase .pole.active .pole-logo { border-color: #ffa044; box-shadow: 0 0 0 2px rgba(255, 85, 0, 0.45); }/* Glassmorphic 3D Pole Pin Badges (Frosted White Glass) */.cesium-showcase .pole-label {  display: flex;  flex-direction: column;  align-items: center;  gap: 2px;  white-space: nowrap;  max-width: 240px;  background: rgba(255, 255, 255, 0.72);  backdrop-filter: blur(20px);  -webkit-backdrop-filter: blur(20px);  color: #0f172a;  padding: 6px 14px;  border-radius: 5px;  border: 1px solid rgba(255, 255, 255, 0.9);  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.95);  font-size: 12px;  font-weight: 400;  letter-spacing: 0.01em;  transition: all .25s cubic-bezier(0.16, 1, 0.3, 1);}.cesium-showcase .pole.hub .pole-label {  background: rgba(255, 255, 255, 0.88);  backdrop-filter: blur(20px);  -webkit-backdrop-filter: blur(20px);  border: 1.5px solid rgba(255, 140, 0, 0.8);  color: #0f172a;  font-weight: 500;  border-radius: 5px !important;  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22), 0 0 18px rgba(255, 150, 0, 0.4);}.cesium-showcase .pole.active .pole-label {  background: rgba(255, 85, 0, 0.95) !important;  backdrop-filter: blur(20px);  -webkit-backdrop-filter: blur(20px);  color: #ffffff !important;  border: 1.5px solid rgba(255, 200, 140, 0.9) !important;  border-radius: 5px !important;  padding: 7px 18px !important;  font-weight: 500 !important;  box-shadow: 0 10px 32px rgba(255, 85, 0, 0.55), 0 0 24px rgba(255, 85, 0, 0.5) !important;}.cesium-showcase .pole-sub {  font-size: 10.5px;  color: #475569;  font-weight: 400;  display: block;}.cesium-showcase .pole.active .pole-sub {  display: block;  color: #fff3e0 !important;  opacity: 1;}.cesium-showcase .pole.hub .pole-sub {  display: block;  color: #c2410c;  font-weight: 500;}.cesium-showcase .pole-line {  width: 2px;  height: 36px;  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.4) 100%);  box-shadow: 0 0 8px rgba(0,0,0,0.35);}.cesium-showcase .pole.hub .pole-line {  background: linear-gradient(180deg, #ff9900 0%, rgba(255,153,0,0.4) 100%);  height: 48px;  box-shadow: 0 0 10px rgba(255,153,0,0.6);}.cesium-showcase .pole.active .pole-line {  background: linear-gradient(180deg, #ff7700 0%, #ff3300 100%) !important;  box-shadow: 0 0 12px rgba(255,85,0,0.9) !important;  height: 46px;}.cesium-showcase .pole-dot {  width: 12px;  height: 12px;  border-radius: 50%;  background: #ffffff;  border: 2px solid #0f172a;  box-shadow: 0 0 8px rgba(0,0,0,0.4);}.cesium-showcase .pole.hub .pole-dot {  width: 16px;  height: 16px;  background: #ff9900;  border-color: #ffffff;  box-shadow: 0 0 0 4px rgba(255, 153, 0, 0.4), 0 0 14px rgba(255, 153, 0, 0.8);}.cesium-showcase .pole.active .pole-dot {  width: 15px;  height: 15px;  background: #ff5500 !important;  border-color: #ffffff !important;  box-shadow: 0 0 0 4px rgba(255, 85, 0, 0.4), 0 0 14px rgba(255, 85, 0, 0.8) !important;}.cesium-showcase .pole-label > span:first-child { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }/* Custom Glassmorphism Scrollbar */.cesium-glass-scroll::-webkit-scrollbar {  width: 5px;}.cesium-glass-scroll::-webkit-scrollbar-track {  background: transparent;}.cesium-glass-scroll::-webkit-scrollbar-thumb {  background: rgba(0, 0, 0, 0.2);  border-radius: 999px;}.cesium-glass-scroll::-webkit-scrollbar-thumb:hover {  background: rgba(0, 0, 0, 0.35);}/* Dark Glassmorphism Theme Overrides */.cesium-showcase.theme-dark {  background: #020409;}.cesium-showcase.theme-dark .pole-label {  background: rgba(15, 23, 42, 0.78);  border: 1px solid rgba(255, 255, 255, 0.18);  color: #f1f5f9;  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);}.cesium-showcase.theme-dark .pole.hub .pole-label {  background: rgba(26, 32, 53, 0.92);  border: 1.5px solid rgba(255, 140, 0, 0.9);  color: #ffedd5;  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), 0 0 18px rgba(255, 150, 0, 0.45);}.cesium-showcase.theme-dark .pole-sub {  color: #94a3b8;}.cesium-showcase.theme-dark .pole.hub .pole-sub {  color: #fb923c;}.cesium-showcase.theme-dark .cesium-glass-scroll::-webkit-scrollbar-thumb {  background: rgba(255, 255, 255, 0.2);}.cesium-showcase.theme-dark .cesium-glass-scroll::-webkit-scrollbar-thumb:hover {  background: rgba(255, 255, 255, 0.35);}/* Hide Cesium ion logo but keep data attribution */.cesium-showcase .cesium-credit-logoContainer { display: none !important; }`;
+const CSS = `@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap');.cesium-showcase, .cesium-showcase * {  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;}.cesium-showcase {  font-weight: 400;  position: relative;  width: 100%;  height: 100vh;  overflow: hidden;  background: #040814;}.cesium-showcase h1 {  font-weight: 500 !important;}.cesium-showcase .map {  position: absolute;  inset: 0;}.cesium-showcase.pick-cursor .map,.cesium-showcase.pick-cursor .map canvas {  cursor: crosshair !important;}.cesium-showcase .pins {  position: absolute;  inset: 0;  pointer-events: none;  z-index: 10;  overflow: hidden;}.cesium-showcase .epicyoung-brand { position: fixed !important; top: 20px !important; right: 28px !important; left: auto !important; width: 132px !important; height: auto !important; z-index: 40; object-fit: contain; filter: brightness(0) invert(1) drop-shadow(0 2px 5px rgba(0,0,0,.85)); pointer-events: none; }.cesium-showcase img[src="/epicyoung-logo.png"] { display: none !important; }.cesium-showcase .pole {  position: absolute;  transform: translate(-50%, -100%);  display: flex;  flex-direction: column;  align-items: center;  pointer-events: auto;  cursor: pointer;  transition: transform .25s cubic-bezier(0.16, 1, 0.3, 1), opacity .25s ease;}.cesium-showcase .pole:hover {  transform: translate(-50%, -100%) scale(1.08);  z-index: 20;}.cesium-showcase .pole.hub { z-index: 100; }.cesium-showcase .pole.active { z-index: 110; }.cesium-showcase .pole.hub:hover, .cesium-showcase .pole.active:hover { z-index: 120; }.cesium-showcase .settings-panel {  position: relative; width: 100%; margin-top: 0;  border: 1px solid rgba(255,255,255,.7); border-radius: 16px;  background: rgba(255,255,255,.72); color: #1e293b; backdrop-filter: blur(24px);  padding: 12px;}.cesium-showcase .settings-panel.collapsed { padding: 12px; }.cesium-showcase .layer-switch {  display: flex; align-items: center; justify-content: space-between; gap: 12px;  width: 100%; padding: 12px 0; text-align: left; font-size: 12px;  border-bottom: 1px solid rgba(100,116,139,.15); cursor: pointer;}.cesium-showcase .layer-switch:focus-visible { outline: 2px solid #ff7700; outline-offset: 4px; }.cesium-showcase .switch-track { width: 30px; height: 18px; border-radius: 20px; background: #94a3b8; padding: 3px; flex-shrink: 0; }.cesium-showcase .switch-track.on { background: #ea580c; }.cesium-showcase .switch-track span { display: block; width: 12px; height: 12px; border-radius: 50%; background: white; transition: transform .2s; }.cesium-showcase .switch-track.on span { transform: translateX(12px); }.cesium-showcase.theme-dark .settings-panel,.cesium-showcase.theme-dark .navigation-panel {  background: rgba(15,23,42,.82); color: #f1f5f9; border-color: rgba(255,255,255,.18);}.cesium-showcase.theme-dark .navigation-panel [class*="text-slate-800"],.cesium-showcase.theme-dark .navigation-panel [class*="text-slate-700"] { color: #e2e8f0; }.cesium-showcase.theme-dark .navigation-panel [class*="text-slate-500"] { color: #cbd5e1; }.cesium-showcase.theme-dark .navigation-panel [class*="bg-white/"] { background-color: rgba(15,23,42,.72); border-color: rgba(255,255,255,.2); }@media (max-width: 700px) {  .cesium-showcase .settings-panel { margin-top: 0; }}/* Logo pin: pengganti label teks, rasio 3:2 atau 4:3 */.cesium-showcase .pole-logo {  background: rgba(255, 255, 255, 0.82);  backdrop-filter: blur(20px);  -webkit-backdrop-filter: blur(20px);  border: 1px solid rgba(255, 255, 255, 0.95);  border-radius: 8px;  padding: 4px;  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.22), inset 0 1px 0 0 rgba(255, 255, 255, 0.95);  transition: all .25s cubic-bezier(0.16, 1, 0.3, 1);  overflow: hidden;}.cesium-showcase .pole-logo.ratio-3-2 { width: 96px; aspect-ratio: 3 / 2; }.cesium-showcase .pole-logo.ratio-4-3 { width: 88px; aspect-ratio: 4 / 3; }.cesium-showcase .pole-logo img {  display: block;  width: 100%;  height: 100%;  object-fit: contain;  border-radius: 5px;}.cesium-showcase .pole.hub .pole-logo { width: 108px; }.cesium-showcase .pole.active .pole-logo { border-color: #ffa044; box-shadow: 0 0 0 2px rgba(255, 85, 0, 0.45); }/* Glassmorphic 3D Pole Pin Badges (Frosted White Glass) */.cesium-showcase .pole-label {  display: flex;  flex-direction: column;  align-items: center;  gap: 2px;  white-space: nowrap;  max-width: 240px;  background: rgba(255, 255, 255, 0.72);  backdrop-filter: blur(20px);  -webkit-backdrop-filter: blur(20px);  color: #0f172a;  padding: 6px 14px;  border-radius: 5px;  border: 1px solid rgba(255, 255, 255, 0.9);  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.95);  font-size: 12px;  font-weight: 400;  letter-spacing: 0.01em;  transition: all .25s cubic-bezier(0.16, 1, 0.3, 1);}.cesium-showcase .pole.hub .pole-label {  background: rgba(255, 255, 255, 0.88);  backdrop-filter: blur(20px);  -webkit-backdrop-filter: blur(20px);  border: 1.5px solid rgba(255, 140, 0, 0.8);  color: #0f172a;  font-weight: 500;  border-radius: 5px !important;  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22), 0 0 18px rgba(255, 150, 0, 0.4);}.cesium-showcase .pole.active .pole-label {  background: rgba(255, 85, 0, 0.95) !important;  backdrop-filter: blur(20px);  -webkit-backdrop-filter: blur(20px);  color: #ffffff !important;  border: 1.5px solid rgba(255, 200, 140, 0.9) !important;  border-radius: 5px !important;  padding: 7px 18px !important;  font-weight: 500 !important;  box-shadow: 0 10px 32px rgba(255, 85, 0, 0.55), 0 0 24px rgba(255, 85, 0, 0.5) !important;}.cesium-showcase .pole-sub {  font-size: 10.5px;  color: #475569;  font-weight: 400;  display: block;}.cesium-showcase .pole.active .pole-sub {  display: block;  color: #fff3e0 !important;  opacity: 1;}.cesium-showcase .pole.hub .pole-sub {  display: block;  color: #c2410c;  font-weight: 500;}.cesium-showcase .pole-line {  width: 2px;  height: 36px;  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.4) 100%);  box-shadow: 0 0 8px rgba(0,0,0,0.35);}.cesium-showcase .pole.hub .pole-line {  background: linear-gradient(180deg, #ff9900 0%, rgba(255,153,0,0.4) 100%);  height: 48px;  box-shadow: 0 0 10px rgba(255,153,0,0.6);}.cesium-showcase .pole.active .pole-line {  background: linear-gradient(180deg, #ff7700 0%, #ff3300 100%) !important;  box-shadow: 0 0 12px rgba(255,85,0,0.9) !important;  height: 46px;}.cesium-showcase .pole-dot {  width: 12px;  height: 12px;  border-radius: 50%;  background: #ffffff;  border: 2px solid #0f172a;  box-shadow: 0 0 8px rgba(0,0,0,0.4);}.cesium-showcase .pole.hub .pole-dot {  width: 16px;  height: 16px;  background: #ff9900;  border-color: #ffffff;  box-shadow: 0 0 0 4px rgba(255, 153, 0, 0.4), 0 0 14px rgba(255, 153, 0, 0.8);}.cesium-showcase .pole.active .pole-dot {  width: 15px;  height: 15px;  background: #ff5500 !important;  border-color: #ffffff !important;  box-shadow: 0 0 0 4px rgba(255, 85, 0, 0.4), 0 0 14px rgba(255, 85, 0, 0.8) !important;}.cesium-showcase .pole-label > span:first-child { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }/* Custom Glassmorphism Scrollbar */.cesium-glass-scroll::-webkit-scrollbar {  width: 5px;}.cesium-glass-scroll::-webkit-scrollbar-track {  background: transparent;}.cesium-glass-scroll::-webkit-scrollbar-thumb {  background: rgba(0, 0, 0, 0.2);  border-radius: 999px;}.cesium-glass-scroll::-webkit-scrollbar-thumb:hover {  background: rgba(0, 0, 0, 0.35);}/* Dark Glassmorphism Theme Overrides */.cesium-showcase.theme-dark {  background: #020409;}.cesium-showcase.theme-dark .pole-label {  background: rgba(15, 23, 42, 0.78);  border: 1px solid rgba(255, 255, 255, 0.18);  color: #f1f5f9;  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);}.cesium-showcase.theme-dark .pole.hub .pole-label {  background: rgba(26, 32, 53, 0.92);  border: 1.5px solid rgba(255, 140, 0, 0.9);  color: #ffedd5;  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), 0 0 18px rgba(255, 150, 0, 0.45);}.cesium-showcase.theme-dark .pole-sub {  color: #94a3b8;}.cesium-showcase.theme-dark .pole.hub .pole-sub {  color: #fb923c;}.cesium-showcase.theme-dark .cesium-glass-scroll::-webkit-scrollbar-thumb {  background: rgba(255, 255, 255, 0.2);}.cesium-showcase.theme-dark .cesium-glass-scroll::-webkit-scrollbar-thumb:hover {  background: rgba(255, 255, 255, 0.35);}/* Hide Cesium ion logo but keep data attribution */.cesium-showcase .cesium-credit-logoContainer { display: none !important; }`;
 type Status = 'loading' | 'ready' | 'error';
 let cesiumLoader: Promise<any> | null = null;
 function loadCesium(): Promise<any> {
@@ -374,8 +374,8 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
   const hubRef = useRef<StartPoint>(DEFAULT_START_POINT);
   const [pois, setPois] = useState<Poi[]>(DEFAULT_POIS);
   const poisRef = useRef<Poi[]>(DEFAULT_POIS);
-  const [autoRotateOnArrival, setAutoRotateOnArrival] = useState(false);
-  const autoArrivalRef = useRef(false); /* Point 1: Hub (Titik A) Single-Input Omnibox + Map Pick Mode */
+  const [autoRotateOnArrival, setAutoRotateOnArrival] = useState(true);
+  const autoArrivalRef = useRef(true); /* Point 1: Hub (Titik A) Single-Input Omnibox + Map Pick Mode */
   const [hubEditorOpen, setHubEditorOpen] = useState(false);
   const [hubQuery, setHubQuery] = useState('');
   const [hubResults, setHubResults] = useState<StartPoint[]>([]);
@@ -478,11 +478,12 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
     }
     return 1.0;
   });
-  const [showRotateSlider, setShowRotateSlider] = useState(false);
+  const [showRotateSlider, setShowRotateSlider] = useState(true);
   const [rotatePanelPos, setRotatePanelPos] = useState<{ x: number; y: number } | null>(null);
   const rotatePanelRef = useRef<HTMLDivElement>(null);
   const isDraggingPanelRef = useRef(false);
   const dragStartOffsetRef = useRef({ x: 0, y: 0 });
+  const dragPanelPosRef = useRef<{ x: number; y: number } | null>(null);
 
   const handlePanelDragStart = (e: React.PointerEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
@@ -495,6 +496,11 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     };
+    dragPanelPosRef.current = { x: rect.left, y: rect.top };
+    panel.style.left = `${rect.left}px`;
+    panel.style.top = `${rect.top}px`;
+    panel.style.right = 'auto';
+    panel.style.bottom = 'auto';
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
 
@@ -510,12 +516,15 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
     const clampedX = Math.max(12, Math.min(window.innerWidth - panelWidth - 12, newX));
     const clampedY = Math.max(12, Math.min(window.innerHeight - panelHeight - 12, newY));
 
-    setRotatePanelPos({ x: clampedX, y: clampedY });
+    dragPanelPosRef.current = { x: clampedX, y: clampedY };
+    panel.style.left = `${clampedX}px`;
+    panel.style.top = `${clampedY}px`;
   };
 
   const handlePanelDragEnd = (e: React.PointerEvent<HTMLDivElement>) => {
     if (isDraggingPanelRef.current) {
       isDraggingPanelRef.current = false;
+      if (dragPanelPosRef.current) setRotatePanelPos(dragPanelPosRef.current);
       try {
         (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
       } catch {/* ignore */}
@@ -830,7 +839,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
             return;
           }
           const cartesian = Cesium.Cartesian3.fromDegrees(loc.lon, loc.lat, loc.height);
-          const canvasPos = Cesium.SceneTransforms.wgs84ToWindowCoordinates(viewer.scene, cartesian);
+          const canvasPos = Cesium.SceneTransforms.worldToWindowCoordinates(viewer.scene, cartesian);
           if (Cesium.defined(canvasPos)) {
             el.style.left = `${canvasPos.x}px`;
             el.style.top = `${canvasPos.y}px`;
@@ -1762,7 +1771,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
           const allLocs = [...curPois.filter(p => p.id !== activePoiRef.current), hubRef.current, ...curPois.filter(p => p.id === activePoiRef.current)].filter(loc => !placeOverridesRef.current[loc.id]?.hidden);
           allLocs.forEach(loc => {
             const cartesian = Cesium.Cartesian3.fromDegrees(loc.lon, loc.lat, loc.height || 60);
-            const pos = Cesium.SceneTransforms.wgs84ToWindowCoordinates(viewer.scene, cartesian);
+            const pos = Cesium.SceneTransforms.worldToWindowCoordinates(viewer.scene, cartesian);
             if (pos && pos.x >= -100 && pos.x <= curRecCanvas.width + 100 && pos.y >= -100 && pos.y <= curRecCanvas.height + 100) {
               const isHub = loc.id === 'hub';
               const isActive = activePoiRef.current === loc.id;
@@ -2588,27 +2597,24 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
 </div>
 </div>
 </aside>
+</div>
       {/* Top Right epicyoung Brand Logo */}
-      <div className="fixed top-4 right-4 z-40 flex items-center justify-center rounded-2xl border border-white/70 bg-white/85 px-3 py-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl transition hover:bg-white/95 hover:scale-105 select-none pointer-events-auto ring-1 ring-black/5">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/epicyoung-logo.png"
-          alt="epicyoung"
-          className="h-6 sm:h-7 w-auto object-contain pointer-events-none"
-          draggable={false}
-        />
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/epicyoung-logo-white.svg?v=2"
+        alt="epicyoung"
+        className="epicyoung-brand"
+        draggable={false}
+      />
 
       {/* Auto-Rotate Floating Control Box di Kanan Bawah (Draggable dengan padding) */}
       {showRotateSlider && (
         <div
           ref={rotatePanelRef}
           style={
-            rotatePanelPos
-              ? { left: `${rotatePanelPos.x}px`, top: `${rotatePanelPos.y}px`, right: 'auto', bottom: 'auto' }
-              : { right: '24px', bottom: '24px' }
+            rotatePanelPos ? { left: `${rotatePanelPos.x}px`, top: `${rotatePanelPos.y}px`, right: 'auto', bottom: 'auto' } : undefined
           }
-          className="fixed z-40 w-80 max-w-[calc(100vw-3rem)] rounded-2xl border border-white/80 bg-white/95 p-3.5 shadow-2xl backdrop-blur-2xl text-slate-800 animate-in fade-in slide-in-from-bottom-2 duration-200 select-none ring-1 ring-black/5"
+          className="fixed bottom-6 left-3 min-[1000px]:left-[332px] z-40 w-80 max-w-[calc(100vw-3rem)] rounded-2xl border border-white/80 bg-white/95 p-3.5 shadow-2xl backdrop-blur-2xl text-slate-800 animate-in fade-in slide-in-from-bottom-2 duration-200 select-none ring-1 ring-black/5"
         >
           {/* Drag Handle & Header */}
           <div
@@ -2717,7 +2723,7 @@ export default function CesiumShowcase({ initialMode = 'default' }: CesiumShowca
           </div>
         </div>
       )}
-</div>      {/* Loading overlay */}      {status === 'loading' && <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md">
+      {/* Loading overlay */}      {status === 'loading' && <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md">
 <div className="rounded-2xl border border-white/20 bg-slate-950/70 p-6 text-center shadow-[0_16px_50px_rgba(0,0,0,0.6)] backdrop-blur-2xl ring-1 ring-white/10">
 <div className="text-sm font-bold text-white">Loading epicyoung 3D Globe...</div>
 <div className="mt-1.5 text-xs text-white/60">              Preparing the globe and map controls            </div>

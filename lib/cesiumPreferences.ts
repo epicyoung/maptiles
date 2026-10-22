@@ -38,14 +38,14 @@ export function readPreferences(raw: string | null): {
   autoRotateOnArrival: boolean;
   skin: MapSkin;
 } {
-  const fallback = { hub: DEFAULT_START_POINT, autoRotateOnArrival: false, skin: DEFAULT_MAP_SKIN };
+  const fallback = { hub: DEFAULT_START_POINT, autoRotateOnArrival: true, skin: DEFAULT_MAP_SKIN };
   if (!raw) return fallback;
   try {
     const value = JSON.parse(raw);
     if (!value || typeof value.hub?.name !== 'string' || typeof value.hub.lat !== 'number' || typeof value.hub.lon !== 'number') return fallback;
     return {
       hub: parseStartPoint(value.hub.name, String(value.hub.lat), String(value.hub.lon)),
-      autoRotateOnArrival: value.autoRotateOnArrival === true,
+      autoRotateOnArrival: value.autoRotateOnArrival !== false,
       skin: isMapSkin(value.skin) ? value.skin : DEFAULT_MAP_SKIN,
     };
   } catch { return fallback; }
